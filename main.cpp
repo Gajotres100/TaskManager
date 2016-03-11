@@ -27,7 +27,7 @@ void MainWindow::OnPaint(HDC hdc)
 }
 
 void MainWindow::OnCommand(int id){		
-	int	a;
+	
 	NumberDialog ndl;	
 	switch(id){	
 		case ID_NEWTASK: 
