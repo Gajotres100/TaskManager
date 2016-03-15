@@ -70,3 +70,9 @@ class Edit : public Window
 protected:
 	virtual tstring ClassName(){ return tstring(_T("EDIT")); }
 };
+
+class ListBox : public Window
+{
+public:
+	std::string ClassName(){ return "LISTBOX"; }
+};
