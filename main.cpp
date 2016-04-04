@@ -1,5 +1,6 @@
 #include "main.h"
 #include "rc.h"
+#include <tlhelp32.h>
 
 HWND Windows;
 
@@ -70,11 +71,48 @@ bool MainWindow::GetTasks()
 		if (*Data && IsWindowVisible(Windows))
 		{
 			if (strcmp(Data, "Program Manager"))
+			{
 				SendMessage(listBox, LB_ADDSTRING, (WPARAM)-1, (LPARAM)Data);
+			}
+				
 		}
 	}
 
 	return false;
+}
+
+bool MainWindow::GetProcesses()
+{
+	HANDLE hProcessSnap;
+	HANDLE hProcess;
+	PROCESSENTRY32 pe32;
+	DWORD dwPriorityClass;
+
+	hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	if (hProcessSnap == INVALID_HANDLE_VALUE)
+	{
+		return(FALSE);
+	}
+
+	pe32.dwSize = sizeof(PROCESSENTRY32);
+
+	if (!Process32First(hProcessSnap, &pe32))
+	{
+		CloseHandle(hProcessSnap);
+		return(FALSE);
+	}
+
+	do
+	{
+		dwPriorityClass = 0;
+		hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pe32.th32ProcessID);
+		SendMessage(listBox, LB_ADDSTRING, 0, (LPARAM)pe32.szExeFile);
+		SendMessage(listBox, LB_ADDSTRING, 1, (LPARAM)pe32.szExeFile);
+	} 
+	while (Process32Next(hProcessSnap, &pe32));
+
+	CloseHandle(hProcessSnap);
+	return(true);
 }
 
 HWND MainWindow::GetFirstWindowText(char buf[], unsigned int max_out, int *text_written){
