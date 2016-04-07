@@ -1,4 +1,5 @@
 #include "nwpwin.h"
+#include <commctrl.h>
 
 
 int Application::Run()
@@ -41,12 +42,14 @@ tstring Window::GenerateClassName()
 Window::Window() : hw(0) {}
 
 bool Window::Create(HWND parent, DWORD style, LPCTSTR caption, int IdOrMenu, 
-	int x, int y, int width, int height)
+	int x, int y, int width, int height, bool isIT)
 {
 	tstring cn = ClassName();
 	if(cn.empty())
 		Register(cn = GenerateClassName());
-	hw = ::CreateWindow(cn.c_str(), caption, style, x, y, width, height, parent, (HMENU)IdOrMenu, 0, this);
+	if (isIT) hw = ::CreateWindow(WC_LISTVIEW, "", WS_CHILD | WS_VISIBLE |LVS_REPORT | LVS_EDITLABELS | WS_BORDER, 0, 0, 500, 500, parent, (HMENU)IdOrMenu, 0, this);
+	else hw = ::CreateWindow(cn.c_str(), caption, style, x, y, width, height, parent, (HMENU)IdOrMenu, 0, this);
+
 	return hw != 0;
 }
 

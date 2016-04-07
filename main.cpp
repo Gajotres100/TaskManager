@@ -1,8 +1,11 @@
 #include "main.h"
 #include "rc.h"
 #include <tlhelp32.h>
+#include <commctrl.h>
 
 HWND Windows;
+LVCOLUMN LvCol;
+LVITEM LvItem;
 
 int NumberDialog::IDD(){
 	return IDD_NUMBER; 
@@ -30,8 +33,17 @@ void MainWindow::OnPaint(HDC hdc)
 
 int MainWindow::OnCreate(CREATESTRUCT* pcs)
 {
-	listBox.Create(*this, WS_CHILD | WS_VISIBLE | WS_BORDER, "", IDC_LB, 0, 0, 640, 640);
-	GetTasks();
+	bool initok = listView.Create(*this, WS_CHILD | LVS_REPORT | LVS_EDITLABELS, "", IDC_LV, 0, 0, 500, 500, true);
+
+	LVCOLUMN lvc;
+	lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
+	lvc.iSubItem = 0;
+	lvc.pszText = "Title";
+	lvc.cx = 50;
+	lvc.fmt = LVCFMT_LEFT;
+	ListView_InsertColumn(listView, 0, &lvc);
+
+	//GetProcesses();
 	return 0;
 }
 
@@ -57,12 +69,12 @@ MainWindow::MainWindow(){
 
 bool MainWindow::GetTasks()
 {
-	SendMessage(listBox, LB_RESETCONTENT, 0, 0);
+	SendMessage(listView, LB_RESETCONTENT, 0, 0);
 
 
 	Windows = GetFirstWindowText(Data, sizeof(Data), 0);
 
-	SendMessage(listBox, LB_ADDSTRING, (WPARAM)-1, (LPARAM)Data);
+	SendMessage(listView, LB_ADDSTRING, (WPARAM)-1, (LPARAM)Data);
 
 	while (Windows)
 	{
@@ -72,7 +84,7 @@ bool MainWindow::GetTasks()
 		{
 			if (strcmp(Data, "Program Manager"))
 			{
-				SendMessage(listBox, LB_ADDSTRING, (WPARAM)-1, (LPARAM)Data);
+				SendMessage(listView, LB_ADDSTRING, (WPARAM)-1, (LPARAM)Data);
 			}
 				
 		}
@@ -106,8 +118,8 @@ bool MainWindow::GetProcesses()
 	{
 		dwPriorityClass = 0;
 		hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pe32.th32ProcessID);
-		SendMessage(listBox, LB_ADDSTRING, 0, (LPARAM)pe32.szExeFile);
-		SendMessage(listBox, LB_ADDSTRING, 1, (LPARAM)pe32.szExeFile);
+		SendMessage(listView, LB_ADDSTRING, 0, (LPARAM)pe32.szExeFile);
+		SendMessage(listView, LB_ADDSTRING, 1, (LPARAM)pe32.szExeFile);
 	} 
 	while (Process32Next(hProcessSnap, &pe32));
 
@@ -135,7 +147,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hp, LPSTR cmdLine, int nShow)
 	MainWindow* wnd = new MainWindow();
 	
 	wnd->Create(NULL, WS_OVERLAPPEDWINDOW | WS_VISIBLE, "NWP", 
-		(int)LoadMenu(hInstance, MAKEINTRESOURCE(IDM_MAIN)));	
+		(int)LoadMenu(hInstance, MAKEINTRESOURCE(IDM_MAIN)));
 
 	return app.Run();
 }

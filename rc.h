@@ -6,6 +6,6 @@
 #define IDD_NUMBER		105
 #define IDC_EDIT1		106
 #define IDC_BROWSE		107
-#define IDC_LB			109
+#define IDC_LV			109
 
 

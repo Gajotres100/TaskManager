@@ -34,7 +34,7 @@ public:
 	Window();
 
 	bool Create(HWND parent, DWORD style, LPCTSTR caption=0, int IdOrMenu=0, 
-		int x=CW_USEDEFAULT, int y=CW_USEDEFAULT, int width=CW_USEDEFAULT, int height=CW_USEDEFAULT);
+		int x = CW_USEDEFAULT, int y = CW_USEDEFAULT, int width = CW_USEDEFAULT, int height = CW_USEDEFAULT, bool isIT = false);
 
 	operator HWND();
 	static LRESULT CALLBACK Proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -69,6 +69,12 @@ class Edit : public Window
 {
 protected:
 	virtual tstring ClassName(){ return tstring(_T("EDIT")); }
+};
+
+class ListView : public Window
+{
+public:
+	std::string ClassName(){ return "WC_LISTVIEW"; }
 };
 
 class ListBox : public Window

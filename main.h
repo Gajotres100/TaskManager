@@ -2,6 +2,7 @@
 #include "nwpdlg.h"
 
 
+
 class NumberDialog : public Dialog {
 public:
 	int broj;
@@ -14,6 +15,7 @@ protected:
 class MainWindow : public Window {
 public:
 	MainWindow();
+	ListView listView;
 	ListBox listBox;
 	bool GetTasks();
 	bool GetProcesses();
