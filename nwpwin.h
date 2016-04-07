@@ -11,6 +11,7 @@
 #include <string>
 #include <sstream>
 #include <tchar.h>
+#include <commctrl.h>
 
 typedef std::basic_string<TCHAR> tstring;
 typedef std::basic_stringstream<TCHAR> tsstream;
@@ -74,7 +75,7 @@ protected:
 class ListView : public Window
 {
 public:
-	std::string ClassName(){ return "WC_LISTVIEW"; }
+	std::string ClassName(){ return WC_LISTVIEW; }
 };
 
 class ListBox : public Window

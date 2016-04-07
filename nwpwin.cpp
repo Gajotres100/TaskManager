@@ -47,8 +47,8 @@ bool Window::Create(HWND parent, DWORD style, LPCTSTR caption, int IdOrMenu,
 	tstring cn = ClassName();
 	if(cn.empty())
 		Register(cn = GenerateClassName());
-	if (isIT) hw = ::CreateWindow(WC_LISTVIEW, "", WS_CHILD | WS_VISIBLE |LVS_REPORT | LVS_EDITLABELS | WS_BORDER, 0, 0, 500, 500, parent, (HMENU)IdOrMenu, 0, this);
-	else hw = ::CreateWindow(cn.c_str(), caption, style, x, y, width, height, parent, (HMENU)IdOrMenu, 0, this);
+	
+	hw = ::CreateWindow(cn.c_str(), caption, style, x, y, width, height, parent, (HMENU)IdOrMenu, 0, this);
 
 	return hw != 0;
 	

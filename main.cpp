@@ -33,7 +33,7 @@ void MainWindow::OnPaint(HDC hdc)
 
 int MainWindow::OnCreate(CREATESTRUCT* pcs)
 {
-	bool initok = listView.Create(*this, WS_CHILD | LVS_REPORT | LVS_EDITLABELS, "", IDC_LV, 0, 0, 500, 500, true);
+	bool initok = listView.Create(*this, WS_CHILD | WS_VISIBLE | LVS_REPORT | LVS_EDITLABELS | WS_BORDER, "", IDC_LV, 0, 0, 500, 500, true);
 
 	LVCOLUMN lvc;
 	lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
@@ -66,32 +66,6 @@ void MainWindow::OnDestroy(){
 MainWindow::MainWindow(){
 
 };
-
-bool MainWindow::GetTasks()
-{
-	SendMessage(listView, LB_RESETCONTENT, 0, 0);
-
-
-	Windows = GetFirstWindowText(Data, sizeof(Data), 0);
-
-	SendMessage(listView, LB_ADDSTRING, (WPARAM)-1, (LPARAM)Data);
-
-	while (Windows)
-	{
-		GetNextWindowText(Data, sizeof(Data), &Windows);
-
-		if (*Data && IsWindowVisible(Windows))
-		{
-			if (strcmp(Data, "Program Manager"))
-			{
-				SendMessage(listView, LB_ADDSTRING, (WPARAM)-1, (LPARAM)Data);
-			}
-				
-		}
-	}
-
-	return false;
-}
 
 bool MainWindow::GetProcesses()
 {
