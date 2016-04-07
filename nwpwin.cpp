@@ -51,6 +51,7 @@ bool Window::Create(HWND parent, DWORD style, LPCTSTR caption, int IdOrMenu,
 	else hw = ::CreateWindow(cn.c_str(), caption, style, x, y, width, height, parent, (HMENU)IdOrMenu, 0, this);
 
 	return hw != 0;
+	
 }
 
 Window::operator HWND()
