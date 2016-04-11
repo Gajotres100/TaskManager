@@ -33,13 +33,9 @@ protected:
 
 public:
 	Window();
-
-	bool Create(HWND parent, DWORD style, LPCTSTR caption=0, int IdOrMenu=0, 
-		int x = CW_USEDEFAULT, int y = CW_USEDEFAULT, int width = CW_USEDEFAULT, int height = CW_USEDEFAULT, bool isIT = false);
-
+	bool Create(HWND parent, DWORD style, LPCTSTR caption=0, int IdOrMenu=0, int x = CW_USEDEFAULT, int y = CW_USEDEFAULT, int width = CW_USEDEFAULT, int height = CW_USEDEFAULT, bool isIT = false);
 	operator HWND();
 	static LRESULT CALLBACK Proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
-
 //	messages
 protected:
 	virtual int OnCreate(CREATESTRUCT*) { return 0; }
@@ -53,9 +49,7 @@ protected:
 	virtual void OnRButtonDown(POINT p)  { }
 	virtual void OnLButtonUp(POINT p)  { }
 	virtual void OnLButtonDblClk(POINT p)  { }
-
 	virtual void OnTimer(int id)  { }
-
 	virtual void OnPaint(HDC dc)  { }
 };
 
@@ -76,10 +70,50 @@ class ListView : public Window
 {
 public:
 	std::string ClassName(){ return WC_LISTVIEW; }
+	bool AddColumn(int index, int width, char* title, HWND handle)
+	{
+		bool success = FALSE;
+		LVCOLUMN lvc;
+		lvc.mask = LVCF_WIDTH | LVCF_TEXT;
+		lvc.cx = width;
+		lvc.cchTextMax = strlen(title);
+		lvc.pszText = title;
+
+		if (SendMessage(handle, LVM_INSERTCOLUMN, index, (LPARAM)&lvc) != -1)
+		{
+			success = TRUE;
+		}
+		return(success);
+	}
+
+	bool AddItem(int index, int subindex, char* value, HWND handle)
+	{
+		bool success = false;
+		LVITEM lvi;
+
+		lvi.mask = LVIF_TEXT;
+		lvi.iItem = index;
+		lvi.iSubItem = subindex;
+		lvi.cchTextMax = strlen(value);
+		lvi.pszText = value;
+
+		if (subindex != 0)
+		{
+			success = (bool)SendMessage(handle, LVM_SETITEM, 0, (LPARAM)&lvi);
+		}
+		else{
+			if (SendMessage(handle, LVM_INSERTITEM, 0, (LPARAM)&lvi) != -1)
+			{
+				success = TRUE;
+			}
+		}
+
+		return(success);
+	}
 };
 
 class ListBox : public Window
 {
 public:
-	std::string ClassName(){ return "LISTBOX"; }
+	std::string ClassName(){ return "LISTBOX"; }	
 };

@@ -19,6 +19,8 @@ public:
 	ListBox listBox;
 	bool GetTasks();
 	bool GetProcesses();
+	bool ListProcessModules(DWORD dwPID);
+	bool PrintMemoryInfo(DWORD dwPID, int subitemIndex);
 	char Data[265];
 	HWND GetFirstWindowText(char buf[], unsigned int max_out, int *text_written);
 	int GetNextWindowText(char buf[], unsigned int max_out, HWND* handle);
