@@ -3,9 +3,7 @@
 #define ID_NEWTASK		103
 #define ID_EXIT			104
 #define ID_REFRESH		105
-#define IDD_NUMBER		105
-#define IDC_EDIT1		106
 #define IDC_BROWSE		107
 #define IDC_LV			109
-
+#define IDC_ENDPROCES	110
 

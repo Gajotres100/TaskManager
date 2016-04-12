@@ -3,16 +3,15 @@
 // Used by TaskManager.rc
 //
 #define VS_VERSION_INFO                 1
-#define IDM_MAIN                        101
-#define ID_FONT                         102
-#define ID_NEWTASK                      103
-#define ID_EXIT                         104
-#define ID_REFRESH                      105
-#define IDD_NUMBER                      105
-#define IDBROWSE                        106
-#define IDC_EDIT1                       106
-#define ID_BROWSE                       106
-#define IDC_STATIC                      -1
+#define IDM_MAIN		101
+#define ID_FONT 		102
+#define ID_NEWTASK		103
+#define ID_EXIT			104
+#define ID_REFRESH		105
+#define IDC_BROWSE		107
+#define IDC_LV			109
+#define IDC_ENDPROCES	110
+
 
 // Next default values for new objects
 // 

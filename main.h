@@ -15,11 +15,13 @@ protected:
 class MainWindow : public Window {
 public:
 	MainWindow();
-	ListView listView;
-	ListBox listBox;
+	ListView ListProcesses;
+	ListBox ListBox;
+	Button EndProcess;
+	Button RefreshProceses;
 	bool GetTasks();
 	bool GetProcesses();
-	bool ListProcessModules(DWORD dwPID);
+	bool ListProcessModules(DWORD dwPID, int subitemIndex);
 	bool PrintMemoryInfo(DWORD dwPID, int subitemIndex);
 	char Data[265];
 	HWND GetFirstWindowText(char buf[], unsigned int max_out, int *text_written);

@@ -42,7 +42,7 @@ tstring Window::GenerateClassName()
 Window::Window() : hw(0) {}
 
 bool Window::Create(HWND parent, DWORD style, LPCTSTR caption, int IdOrMenu, 
-	int x, int y, int width, int height, bool isIT)
+	int x, int y, int width, int height)
 {
 	tstring cn = ClassName();
 	if(cn.empty())
