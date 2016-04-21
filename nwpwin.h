@@ -110,6 +110,32 @@ public:
 
 		return(success);
 	}
+
+	void SetExSyles(char* styles, HWND handle)
+	{
+		DWORD exflags = WS_EX_LEFT;
+
+		if (strstr(styles, "fullrow") || strstr(styles, "fullrowsel") ||
+			strstr(styles, "full row") || strstr(styles, "full sel"))
+		{
+			exflags |= LVS_EX_FULLROWSELECT;
+		}
+
+		if (strstr(styles, "header"))
+		{
+			exflags |= LVS_EX_HEADERINALLVIEWS;
+		}
+
+		if (strstr(styles, "overflow"))
+		{
+			exflags |= LVS_EX_COLUMNOVERFLOW;
+		}
+
+		if (handle)
+		{
+			SendMessage(handle, LVM_SETEXTENDEDLISTVIEWSTYLE, exflags, exflags);
+		}
+	}
 };
 
 class ListBox : public Window

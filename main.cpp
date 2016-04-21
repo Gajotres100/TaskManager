@@ -32,26 +32,34 @@ void MainWindow::OnPaint(HDC hdc)
 
 int MainWindow::OnCreate(CREATESTRUCT* pcs)
 {
-	ListProcesses.Create(*this, WS_CHILD | WS_VISIBLE | LVS_REPORT | LVS_EDITLABELS | WS_BORDER, "", IDC_LV, 0, 0, 500, 500);
+	ListProcesses.Create(*this, WS_CHILD | WS_VISIBLE | LVS_REPORT | LVS_EDITLABELS | WS_BORDER , "", IDC_LV, 0, 0, 500, 500);
+
 	EndProcess.Create(*this, WS_CHILD | WS_VISIBLE | WS_BORDER, "End Task", IDC_ENDPROCES, 0, 510, 120, 40);
 	EndProcess.Create(*this, WS_CHILD | WS_VISIBLE | WS_BORDER, "Refresh now", ID_REFRESH, 130, 510, 120, 40);
 
 
 	ListView* lv = new ListView();
+	lv->SetExSyles("fullrow header overflow", ListProcesses);
 	lv->AddColumn(0, 190, "Ime", ListProcesses);
 	lv->AddColumn(1, 100, "ProcessID", ListProcesses);
 	lv->AddColumn(2, 120, "Broj threadova", ListProcesses);
-	lv->AddColumn(3, 75, "Lokacija", ListProcesses);
+	lv->AddColumn(3, 350, "Lokacija", ListProcesses);
 	GetProcesses();
 	return 0;
 }
 
 void MainWindow::OnCommand(int id){		
-	
+	int index;
 	NumberDialog ndl;	
 	switch(id){	
 		case ID_NEWTASK: 
 			break;
+		case IDC_ENDPROCES:
+			index = SendMessage(ListProcesses, LVM_GETNEXTITEM, (WPARAM)-1, (LPARAM)LVNI_SELECTED);
+			KillProcess(index);
+			break;		
+		case ID_REFRESH:
+			break;			
 		case ID_EXIT: 
 			DestroyWindow(*this);
 			break;
@@ -109,7 +117,7 @@ bool MainWindow::GetProcesses()
 		ListProcessModules(pe32.th32ProcessID, subitemIndex);
 
 		//Nekako izraèunati memoriju za pojedini proces da je kao 
-		//ListProcessModules(pe32.th32ProcessID, subitemIndex);
+		//PrintMemoryInfo(pe32.th32ProcessID, subitemIndex);
 
 		subitemIndex++;
 	} 
@@ -149,7 +157,6 @@ bool MainWindow::ListProcessModules(DWORD dwPID, int subitemIndex)
 	return(true);
 }
 
-
 bool MainWindow::PrintMemoryInfo(DWORD processID, int subitemIndex)
 {
 	HANDLE hProcess;
@@ -163,13 +170,51 @@ bool MainWindow::PrintMemoryInfo(DWORD processID, int subitemIndex)
 
 	if (GetProcessMemoryInfo(hProcess, &pmc, sizeof(pmc)))
 	{
-		char procID[50];
-		sprintf(procID, "%d", (pmc.WorkingSetSize / 1048576));
+		char workingSetSize[50];
+		sprintf(workingSetSize, "%d", pmc.PagefileUsage);
 		ListView* lv = new ListView();
-		lv->AddItem(subitemIndex, 3, procID, ListProcesses);
+		lv->AddItem(subitemIndex, 3, workingSetSize, ListProcesses);
 	}
 
 	CloseHandle(hProcess);
+}
+
+bool MainWindow::KillProcess(int index)
+{
+	char retText[500];
+
+	int report;
+	LVITEM lvi;
+
+	lvi.mask = LVIF_TEXT | LVIF_STATE;
+	lvi.state = LVIS_SELECTED;
+	lvi.stateMask = LVIS_SELECTED;
+	lvi.iSubItem = 1;
+	lvi.pszText = retText;
+	lvi.cchTextMax = MAX_PATH;
+	lvi.iItem = index;
+
+	SendMessage(ListProcesses, LVM_GETITEM, 0, (LPARAM)&lvi);
+
+	HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, 0, atoi(lvi.pszText));
+
+	if (TerminateProcess(hProcess, 0) == 0)
+	{
+		MessageBox(NULL, "Terminating process failed !", "KillProcess", MB_OK | MB_ICONERROR);
+	}
+
+	else
+	{
+		
+	}
+
+	CloseHandle(hProcess);
+
+	//if (report == 0)
+	//	MessageBox(NULL, "Process cannot be found !", "KillProcess", MB_OK | MB_ICONWARNING);
+
+	//report = 0;
+	return true;
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hp, LPSTR cmdLine, int nShow)
