@@ -26,6 +26,7 @@ bool NumberDialog::OnOK(){
 	}
 }
 
+
  
 void MainWindow::OnPaint(HDC hdc)
 {
@@ -52,9 +53,13 @@ int MainWindow::OnCreate(CREATESTRUCT* pcs)
 
 void MainWindow::OnCommand(int id){		
 	int index;
-	NumberDialog ndl;	
+	NumberDialog ndl;
+
 	switch(id){	
 		case ID_NEWTASK: 
+			break;
+		case LVN_COLUMNCLICK:
+			index = 0;
 			break;
 		case IDC_ENDPROCES:
 			index = SendMessage(ListProcesses, LVM_GETNEXTITEM, (WPARAM)-1, (LPARAM)LVNI_SELECTED);

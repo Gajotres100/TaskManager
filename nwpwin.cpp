@@ -76,7 +76,10 @@ LRESULT CALLBACK Window::Proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPa
 		pw->hw = hwnd;
 		return pw->OnCreate(pcs);
 	}
-
+	if (message == WM_NOTIFY)
+	{
+		int a= 0;
+	}
 	Window* pThis = reinterpret_cast<Window*>(::GetWindowLong(hwnd, 0));
 	switch (message)
 	{
