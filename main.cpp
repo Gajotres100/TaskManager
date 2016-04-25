@@ -9,10 +9,12 @@ HWND Windows;
 int NumberDialog::IDD(){
 	return 0; 
 }
+
 bool NumberDialog::OnInitDialog(){
 	
 	return true;
 }
+
 bool NumberDialog::OnOK(){
 	try
 	{		
@@ -56,7 +58,11 @@ void MainWindow::OnCommand(int id){
 			break;
 		case IDC_ENDPROCES:
 			index = SendMessage(ListProcesses, LVM_GETNEXTITEM, (WPARAM)-1, (LPARAM)LVNI_SELECTED);
-			KillProcess(index);
+			while (index != -1) 
+			{
+				KillProcess(index);
+				index = SendMessage(ListProcesses, LVM_GETNEXTITEM, index, (LPARAM)LVNI_SELECTED);
+			}
 			break;		
 		case ID_REFRESH:
 			break;			
@@ -64,6 +70,8 @@ void MainWindow::OnCommand(int id){
 			DestroyWindow(*this);
 			break;
 	}
+
+	GetProcesses();
 }
 
 void MainWindow::OnDestroy(){
@@ -76,6 +84,7 @@ MainWindow::MainWindow(){
 
 bool MainWindow::GetProcesses()
 {
+	SendMessage(ListProcesses, LVM_DELETEALLITEMS, 0, 0);
 	HANDLE hProcessSnap;
 	HANDLE hProcess;
 	PROCESSENTRY32 pe32;
@@ -203,17 +212,8 @@ bool MainWindow::KillProcess(int index)
 		MessageBox(NULL, "Terminating process failed !", "KillProcess", MB_OK | MB_ICONERROR);
 	}
 
-	else
-	{
-		
-	}
-
 	CloseHandle(hProcess);
 
-	//if (report == 0)
-	//	MessageBox(NULL, "Process cannot be found !", "KillProcess", MB_OK | MB_ICONWARNING);
-
-	//report = 0;
 	return true;
 }
 
