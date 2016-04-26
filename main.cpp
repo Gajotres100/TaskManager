@@ -48,64 +48,17 @@ int MainWindow::OnCreate(CREATESTRUCT* pcs)
 
 	ListProcesses.Create(*this, WS_CHILD | WS_VISIBLE | LVS_REPORT | LVS_EDITLABELS | WS_BORDER , "", IDC_LV, 0, 0, 500, 500);
 
-	//EndProcess.Create(*this, WS_CHILD | WS_VISIBLE | WS_BORDER, "End Task", IDC_ENDPROCES, 0, 510, 120, 40);
-	//EndProcess.Create(*this, WS_CHILD | WS_VISIBLE | WS_BORDER, "Refresh now", ID_REFRESH, 130, 510, 120, 40);
+	EndProcess.Create(*this, WS_CHILD | WS_VISIBLE | WS_BORDER, "End Task", IDC_ENDPROCES, 0, 510, 120, 40);
+	EndProcess.Create(*this, WS_CHILD | WS_VISIBLE | WS_BORDER, "Refresh now", ID_REFRESH, 130, 510, 120, 40);
 
 
-	//ListView* lv = new ListView();
+	ListView* lv = new ListView();
 	//lv->SetExSyles("fullrow header overflow", ListProcesses);
-	//lv->AddColumn(0, 190, "Ime", ListProcesses);
-	//lv->AddColumn(1, 100, "ProcessID", ListProcesses);
-	//lv->AddColumn(2, 120, "Broj threadova", ListProcesses);
-	//lv->AddColumn(3, 350, "Lokacija", ListProcesses);
-	//GetProcesses();
-
-	char szText[64];
-	int nCol, nItem, nSubItem;
-	LVCOLUMN lvc;
-	LVITEM lvi;
-
-	// get list view handle
-	HWND hwndList = ListProcesses;
-
-	// set up list view columns
-	lvc.mask = LVCF_FMT | LVCF_SUBITEM | LVCF_TEXT | LVCF_WIDTH;
-	lvc.fmt = LVCFMT_LEFT;
-	lvc.cx = 75;
-	for (nCol = 0; nCol < 4; ++nCol)
-	{
-		sprintf(szText, "Column %d", nCol);
-		lvc.iSubItem = nCol;
-		lvc.pszText = szText;
-		lvc.cchTextMax = strlen(szText);
-		ListView_InsertColumn(hwndList, nCol, &lvc);
-	}
-
-	// set up list view items
-	for (nItem = 0; nItem < 5; ++nItem)
-	{
-		sprintf(szText, "Item %d", nItem);
-		lvi.mask = LVIF_TEXT | LVIF_PARAM;
-		lvi.iItem = nItem;
-		lvi.iSubItem = 0;
-		lvi.pszText = szText;
-		lvi.cchTextMax = strlen(szText);
-		lvi.lParam = nItem;
-		ListView_InsertItem(hwndList, &lvi);
-
-		// set up subitems
-		for (nSubItem = 1; nSubItem < 4; ++nSubItem)
-		{
-			sprintf(szText, "Item %d.%d", nItem, nSubItem);
-			lvi.mask = LVIF_TEXT;
-			lvi.iItem = nItem;
-			lvi.iSubItem = nSubItem;
-			lvi.pszText = szText;
-			lvi.cchTextMax = strlen(szText);
-			ListView_SetItem(hwndList, &lvi);
-		}
-	}
-
+	lv->AddColumn(0, 190, "Ime", ListProcesses);
+	lv->AddColumn(1, 100, "ProcessID", ListProcesses);
+	lv->AddColumn(2, 120, "Broj threadova", ListProcesses);
+	lv->AddColumn(3, 350, "Lokacija", ListProcesses);
+	GetProcesses();
 	return 0;
 }
 
@@ -148,6 +101,12 @@ MainWindow::MainWindow(){
 bool MainWindow::GetProcesses()
 {
 	SendMessage(ListProcesses, LVM_DELETEALLITEMS, 0, 0);
+
+	char szText[64];
+	int nCol, nItem, nSubItem;
+	LVCOLUMN lvc;
+	LVITEM lvi;
+
 	HANDLE hProcessSnap;
 	HANDLE hProcess;
 	PROCESSENTRY32 pe32;
@@ -166,7 +125,7 @@ bool MainWindow::GetProcesses()
 		CloseHandle(hProcessSnap);
 		return(FALSE);
 	}
-	int subitemIndex = 0;
+	int item = 0;
 	do
 	{
 		HANDLE hModuleSnap = INVALID_HANDLE_VALUE;
@@ -180,18 +139,15 @@ bool MainWindow::GetProcesses()
 		ListView* lv = new ListView();
 		char procID[50],threadCount[50], priority[50];
 		sprintf(procID, "%d", pe32.th32ProcessID);
-		sprintf(threadCount, "%d", pe32.cntThreads);		
+		sprintf(threadCount, "%d", pe32.cntThreads);
 
-		lv->AddItem(subitemIndex, 0, pe32.szExeFile, ListProcesses);
-		lv->AddItem(subitemIndex, 1, procID, ListProcesses);
-		lv->AddItem(subitemIndex, 2, threadCount, ListProcesses);		
+		lv->AddItem(item, 0, pe32.szExeFile, ListProcesses);
+		lv->AddItem(item, 1, procID, ListProcesses);
+		lv->AddItem(item, 2, threadCount, ListProcesses);
 
-		ListProcessModules(pe32.th32ProcessID, subitemIndex);
+		ListProcessModules(pe32.th32ProcessID, item);
 
-		//Nekako izraèunati memoriju za pojedini proces da je kao 
-		//PrintMemoryInfo(pe32.th32ProcessID, subitemIndex);
-
-		subitemIndex++;
+		item++;
 	} 
 	while (Process32Next(hProcessSnap, &pe32));
 
@@ -284,6 +240,7 @@ int CALLBACK CompareListItems(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
 {
 	BOOL bSortAscending = (lParamSort > 0);
 	int nColumn = abs(lParamSort);
+
 	return bSortAscending ? (lParam1 - lParam2) : (lParam2 - lParam1);
 }
 

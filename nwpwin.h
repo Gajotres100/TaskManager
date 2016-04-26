@@ -72,28 +72,30 @@ public:
 	std::string ClassName(){ return WC_LISTVIEW; }
 	bool AddColumn(int index, int width, char* title, HWND handle)
 	{
-		bool success = FALSE;
+		bool success = false;
 		LVCOLUMN lvc;
 		lvc.mask = LVCF_FMT | LVCF_SUBITEM | LVCF_TEXT | LVCF_WIDTH;
 		lvc.fmt = LVCFMT_LEFT;
 		lvc.cx = width;
-		lvc.cchTextMax = strlen(title);
+		lvc.iSubItem = index;
 		lvc.pszText = title;
+		lvc.cchTextMax = strlen(title);
 		success = ListView_InsertColumn(handle, index, &lvc);
 		
 		return(success);
 	}
 
-	bool AddItem(int index, int subindex, char* value, HWND handle)
+	bool AddItem(int item, int subItem, char* value, HWND handle)
 	{
 		bool success = false;
 		LVITEM lvi;		
-		lvi.iItem = index;
-		lvi.iSubItem = subindex;
+		lvi.iItem = item;
+		lvi.iSubItem = subItem;
 		lvi.cchTextMax = strlen(value);
 		lvi.pszText = value;
+		lvi.lParam = item;
 
-		if (subindex != 0)
+		if (subItem != 0)
 		{
 			lvi.mask = LVIF_TEXT;
 			success = ListView_InsertItem(handle, &lvi);
