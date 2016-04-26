@@ -44,19 +44,68 @@ void MainWindow::OnNotify(LPARAM lParam)
 
 int MainWindow::OnCreate(CREATESTRUCT* pcs)
 {
+	//HWND hwndList = GetDlgItem(Windows, IDC_LV);
+
 	ListProcesses.Create(*this, WS_CHILD | WS_VISIBLE | LVS_REPORT | LVS_EDITLABELS | WS_BORDER , "", IDC_LV, 0, 0, 500, 500);
 
-	EndProcess.Create(*this, WS_CHILD | WS_VISIBLE | WS_BORDER, "End Task", IDC_ENDPROCES, 0, 510, 120, 40);
-	EndProcess.Create(*this, WS_CHILD | WS_VISIBLE | WS_BORDER, "Refresh now", ID_REFRESH, 130, 510, 120, 40);
+	//EndProcess.Create(*this, WS_CHILD | WS_VISIBLE | WS_BORDER, "End Task", IDC_ENDPROCES, 0, 510, 120, 40);
+	//EndProcess.Create(*this, WS_CHILD | WS_VISIBLE | WS_BORDER, "Refresh now", ID_REFRESH, 130, 510, 120, 40);
 
 
-	ListView* lv = new ListView();
-	lv->SetExSyles("fullrow header overflow", ListProcesses);
-	lv->AddColumn(0, 190, "Ime", ListProcesses);
-	lv->AddColumn(1, 100, "ProcessID", ListProcesses);
-	lv->AddColumn(2, 120, "Broj threadova", ListProcesses);
-	lv->AddColumn(3, 350, "Lokacija", ListProcesses);
-	GetProcesses();
+	//ListView* lv = new ListView();
+	//lv->SetExSyles("fullrow header overflow", ListProcesses);
+	//lv->AddColumn(0, 190, "Ime", ListProcesses);
+	//lv->AddColumn(1, 100, "ProcessID", ListProcesses);
+	//lv->AddColumn(2, 120, "Broj threadova", ListProcesses);
+	//lv->AddColumn(3, 350, "Lokacija", ListProcesses);
+	//GetProcesses();
+
+	char szText[64];
+	int nCol, nItem, nSubItem;
+	LVCOLUMN lvc;
+	LVITEM lvi;
+
+	// get list view handle
+	HWND hwndList = ListProcesses;
+
+	// set up list view columns
+	lvc.mask = LVCF_FMT | LVCF_SUBITEM | LVCF_TEXT | LVCF_WIDTH;
+	lvc.fmt = LVCFMT_LEFT;
+	lvc.cx = 75;
+	for (nCol = 0; nCol < 4; ++nCol)
+	{
+		sprintf(szText, "Column %d", nCol);
+		lvc.iSubItem = nCol;
+		lvc.pszText = szText;
+		lvc.cchTextMax = strlen(szText);
+		ListView_InsertColumn(hwndList, nCol, &lvc);
+	}
+
+	// set up list view items
+	for (nItem = 0; nItem < 5; ++nItem)
+	{
+		sprintf(szText, "Item %d", nItem);
+		lvi.mask = LVIF_TEXT | LVIF_PARAM;
+		lvi.iItem = nItem;
+		lvi.iSubItem = 0;
+		lvi.pszText = szText;
+		lvi.cchTextMax = strlen(szText);
+		lvi.lParam = nItem;
+		ListView_InsertItem(hwndList, &lvi);
+
+		// set up subitems
+		for (nSubItem = 1; nSubItem < 4; ++nSubItem)
+		{
+			sprintf(szText, "Item %d.%d", nItem, nSubItem);
+			lvi.mask = LVIF_TEXT;
+			lvi.iItem = nItem;
+			lvi.iSubItem = nSubItem;
+			lvi.pszText = szText;
+			lvi.cchTextMax = strlen(szText);
+			ListView_SetItem(hwndList, &lvi);
+		}
+	}
+
 	return 0;
 }
 
@@ -244,7 +293,6 @@ bool MainWindow::OnColumnClick(LPNMLISTVIEW pLVInfo)
 	static BOOL bSortAscending = TRUE;
 	LPARAM lParamSort;
 
-	// get new sort parameters
 	if (pLVInfo->iSubItem == nSortColumn)
 		bSortAscending = !bSortAscending;
 	else
@@ -256,7 +304,7 @@ bool MainWindow::OnColumnClick(LPNMLISTVIEW pLVInfo)
 	if (!bSortAscending)
 		lParamSort = -lParamSort;
 
-	ListView_SortItems(ListProcesses, CompareListItems, lParamSort);
+	ListView_SortItems(pLVInfo->hdr.hwndFrom, CompareListItems, lParamSort);
 
 	return 0;
 

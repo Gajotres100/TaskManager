@@ -74,24 +74,20 @@ public:
 	{
 		bool success = FALSE;
 		LVCOLUMN lvc;
-		lvc.mask = LVCF_WIDTH | LVCF_TEXT;
+		lvc.mask = LVCF_FMT | LVCF_SUBITEM | LVCF_TEXT | LVCF_WIDTH;
+		lvc.fmt = LVCFMT_LEFT;
 		lvc.cx = width;
 		lvc.cchTextMax = strlen(title);
 		lvc.pszText = title;
-
-		if (SendMessage(handle, LVM_INSERTCOLUMN, index, (LPARAM)&lvc) != -1)
-		{
-			success = TRUE;
-		}
+		success = ListView_InsertColumn(handle, index, &lvc);
+		
 		return(success);
 	}
 
 	bool AddItem(int index, int subindex, char* value, HWND handle)
 	{
 		bool success = false;
-		LVITEM lvi;
-
-		lvi.mask = LVIF_TEXT;
+		LVITEM lvi;		
 		lvi.iItem = index;
 		lvi.iSubItem = subindex;
 		lvi.cchTextMax = strlen(value);
@@ -99,13 +95,13 @@ public:
 
 		if (subindex != 0)
 		{
-			success = (bool)SendMessage(handle, LVM_SETITEM, 0, (LPARAM)&lvi);
+			lvi.mask = LVIF_TEXT;
+			success = ListView_InsertItem(handle, &lvi);
+			ListView_SetItem(handle, &lvi);
 		}
 		else{
-			if (SendMessage(handle, LVM_INSERTITEM, 0, (LPARAM)&lvi) != -1)
-			{
-				success = TRUE;
-			}
+			lvi.mask = LVIF_TEXT | LVIF_PARAM;
+			success = ListView_InsertItem(handle, &lvi);
 		}
 
 		return(success);
