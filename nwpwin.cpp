@@ -76,10 +76,7 @@ LRESULT CALLBACK Window::Proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPa
 		pw->hw = hwnd;
 		return pw->OnCreate(pcs);
 	}
-	if (message == WM_NOTIFY)
-	{
-		int a= 0;
-	}
+
 	Window* pThis = reinterpret_cast<Window*>(::GetWindowLong(hwnd, 0));
 	switch (message)
 	{
@@ -93,6 +90,7 @@ LRESULT CALLBACK Window::Proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPa
 		case WM_LBUTTONUP: 		pThis->OnLButtonUp(GetPoint(lParam)); 		return 0;
 		case WM_LBUTTONDBLCLK:	pThis->OnLButtonDblClk(GetPoint(lParam));	return 0;
 		case WM_TIMER:			pThis->OnTimer(wParam);						return 0;
+		case WM_NOTIFY:			pThis->OnNotify(lParam);			return 0;
 		case WM_PAINT:			
 			PAINTSTRUCT ps;
 			HDC hdc = BeginPaint(hwnd, &ps);

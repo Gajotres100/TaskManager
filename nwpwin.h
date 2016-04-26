@@ -41,7 +41,6 @@ protected:
 	virtual int OnCreate(CREATESTRUCT*) { return 0; }
 	virtual void OnCommand(int)  { }
 	virtual void OnDestroy()  { }
-
 	virtual void OnKeyDown(int key)  { }
 	virtual void OnKeyUp(int key)  { }
 	virtual void OnChar(TCHAR c)  { }
@@ -51,6 +50,7 @@ protected:
 	virtual void OnLButtonDblClk(POINT p)  { }
 	virtual void OnTimer(int id)  { }
 	virtual void OnPaint(HDC dc)  { }
+	virtual void OnNotify(LPARAM lParam)  { }
 };
 
 

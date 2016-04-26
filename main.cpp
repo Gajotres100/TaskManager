@@ -5,6 +5,7 @@
 #include <psapi.h>
 
 HWND Windows;
+int CALLBACK CompareListItems(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
 
 int NumberDialog::IDD(){
 	return 0; 
@@ -31,6 +32,14 @@ bool NumberDialog::OnOK(){
 void MainWindow::OnPaint(HDC hdc)
 {
 	
+}
+
+void MainWindow::OnNotify(LPARAM lParam)
+{
+	if ((((LPNMHDR)lParam)->idFrom == IDC_LV) && (((LPNMHDR)lParam)->code == LVN_COLUMNCLICK))
+	{
+		OnColumnClick((LPNMLISTVIEW)lParam);
+	}
 }
 
 int MainWindow::OnCreate(CREATESTRUCT* pcs)
@@ -221,6 +230,39 @@ bool MainWindow::KillProcess(int index)
 
 	return true;
 }
+
+int CALLBACK CompareListItems(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
+{
+	BOOL bSortAscending = (lParamSort > 0);
+	int nColumn = abs(lParamSort);
+	return bSortAscending ? (lParam1 - lParam2) : (lParam2 - lParam1);
+}
+
+bool MainWindow::OnColumnClick(LPNMLISTVIEW pLVInfo)
+{
+	static int nSortColumn = 0;
+	static BOOL bSortAscending = TRUE;
+	LPARAM lParamSort;
+
+	// get new sort parameters
+	if (pLVInfo->iSubItem == nSortColumn)
+		bSortAscending = !bSortAscending;
+	else
+	{
+		nSortColumn = pLVInfo->iSubItem;
+		bSortAscending = TRUE;
+	}
+	lParamSort = 1 + nSortColumn;
+	if (!bSortAscending)
+		lParamSort = -lParamSort;
+
+	ListView_SortItems(ListProcesses, CompareListItems, lParamSort);
+
+	return 0;
+
+}
+
+
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hp, LPSTR cmdLine, int nShow)
 {
