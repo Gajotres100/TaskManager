@@ -4,7 +4,8 @@
 #include <commctrl.h>
 #include <psapi.h>
 
-HWND temp;
+HWND mainwindow;
+
 int CALLBACK CompareListItems(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
 
 int NumberDialog::IDD(){
@@ -45,6 +46,8 @@ void MainWindow::OnNotify(LPARAM lParam)
 int MainWindow::OnCreate(CREATESTRUCT* pcs)
 {
 	//HWND hwndList = GetDlgItem(Windows, IDC_LV);
+
+	mainwindow = *this;
 
 	ListProcesses.Create(*this, WS_CHILD | WS_VISIBLE | LVS_REPORT | LVS_EDITLABELS | WS_BORDER, "", IDC_LV, 0, 0, 500, 500);
 
@@ -245,14 +248,16 @@ int CALLBACK CompareListItems(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
 {
 	int nRetVal;
 
+	HWND hwndList = GetDlgItem(mainwindow, IDC_LV);
+
 	bool isAsc = (lParamSort > 0);
 	int nColumn = abs(lParamSort) -1;
 
 	TCHAR str1[MAX_PATH];
 	TCHAR str2[MAX_PATH];
 
-	ListView_GetItemText(temp, lParam1, nColumn, str1, MAX_PATH);
-	ListView_GetItemText(temp, lParam2, nColumn, str2, MAX_PATH);
+	ListView_GetItemText(hwndList, lParam1, nColumn, str1, MAX_PATH);
+	ListView_GetItemText(hwndList, lParam2, nColumn, str2, MAX_PATH);
 
 	if (nColumn == 1 || nColumn == 2)
 	{
@@ -293,9 +298,7 @@ bool MainWindow::OnColumnClick(LPNMLISTVIEW pLVInfo)
 	lParamSort = 1 + nSortColumn;
 	if (!bSortAscending)
 		lParamSort = -lParamSort;
-
 	
-	temp = pLVInfo->hdr.hwndFrom;
 	ListView_SortItems(pLVInfo->hdr.hwndFrom, CompareListItems, lParamSort);	
 
 	return 0;
@@ -308,7 +311,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hp, LPSTR cmdLine, int nShow)
 {
 	Application app;
 	MainWindow* wnd = new MainWindow();
-	
+
 	wnd->Create(NULL, WS_OVERLAPPEDWINDOW | WS_VISIBLE, "NWP", 
 		(int)LoadMenu(hInstance, MAKEINTRESOURCE(IDM_MAIN)),0,0,520,630);
 
