@@ -89,6 +89,10 @@ public:
 	{
 		bool success = false;
 		LVITEM lvi;		
+
+		for (int i = 0; i < strlen(value); ++i)
+			value[i] = tolower(value[i]);
+
 		lvi.iItem = item;
 		lvi.iSubItem = subItem;
 		lvi.cchTextMax = strlen(value);

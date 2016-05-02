@@ -4,7 +4,7 @@
 #include <commctrl.h>
 #include <psapi.h>
 
-HWND Windows;
+HWND temp;
 int CALLBACK CompareListItems(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
 
 int NumberDialog::IDD(){
@@ -46,14 +46,14 @@ int MainWindow::OnCreate(CREATESTRUCT* pcs)
 {
 	//HWND hwndList = GetDlgItem(Windows, IDC_LV);
 
-	ListProcesses.Create(*this, WS_CHILD | WS_VISIBLE | LVS_REPORT | LVS_EDITLABELS | WS_BORDER , "", IDC_LV, 0, 0, 500, 500);
+	ListProcesses.Create(*this, WS_CHILD | WS_VISIBLE | LVS_REPORT | LVS_EDITLABELS | WS_BORDER, "", IDC_LV, 0, 0, 500, 500);
 
 	EndProcess.Create(*this, WS_CHILD | WS_VISIBLE | WS_BORDER, "End Task", IDC_ENDPROCES, 0, 510, 120, 40);
 	EndProcess.Create(*this, WS_CHILD | WS_VISIBLE | WS_BORDER, "Refresh now", ID_REFRESH, 130, 510, 120, 40);
 
 
 	ListView* lv = new ListView();
-	//lv->SetExSyles("fullrow header overflow", ListProcesses);
+	lv->SetExSyles("fullrow header overflow", ListProcesses);
 	lv->AddColumn(0, 190, "Ime", ListProcesses);
 	lv->AddColumn(1, 100, "ProcessID", ListProcesses);
 	lv->AddColumn(2, 120, "Broj threadova", ListProcesses);
@@ -138,16 +138,20 @@ bool MainWindow::GetProcesses()
 		hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pe32.th32ProcessID);
 		ListView* lv = new ListView();
 		char procID[50],threadCount[50], priority[50];
-		sprintf(procID, "%d", pe32.th32ProcessID);
-		sprintf(threadCount, "%d", pe32.cntThreads);
 
-		lv->AddItem(item, 0, pe32.szExeFile, ListProcesses);
-		lv->AddItem(item, 1, procID, ListProcesses);
-		lv->AddItem(item, 2, threadCount, ListProcesses);
+		if (pe32.th32ProcessID > 0)
+		{
+			sprintf(procID, "%d", pe32.th32ProcessID);
+			sprintf(threadCount, "%d", pe32.cntThreads);
 
-		ListProcessModules(pe32.th32ProcessID, item);
+			lv->AddItem(item, 0, pe32.szExeFile, ListProcesses);
+			lv->AddItem(item, 1, procID, ListProcesses);
+			lv->AddItem(item, 2, threadCount, ListProcesses);
 
-		item++;
+			ListProcessModules(pe32.th32ProcessID, item);
+
+			item++;
+		}
 	} 
 	while (Process32Next(hProcessSnap, &pe32));
 
@@ -236,12 +240,41 @@ bool MainWindow::KillProcess(int index)
 	return true;
 }
 
+
 int CALLBACK CompareListItems(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
 {
-	BOOL bSortAscending = (lParamSort > 0);
-	int nColumn = abs(lParamSort);
+	int nRetVal;
 
-	return bSortAscending ? (lParam1 - lParam2) : (lParam2 - lParam1);
+	bool isAsc = (lParamSort > 0);
+	int nColumn = abs(lParamSort) -1;
+
+	TCHAR str1[MAX_PATH];
+	TCHAR str2[MAX_PATH];
+
+	ListView_GetItemText(temp, lParam1, nColumn, str1, MAX_PATH);
+	ListView_GetItemText(temp, lParam2, nColumn, str2, MAX_PATH);
+
+	if (nColumn == 1 || nColumn == 2)
+	{
+		int i = 0, j = 0;
+		if (isAsc)
+		{
+			i = atoi(str1);
+			j = atoi(str2);
+		}
+		else
+		{
+			j = atoi(str1);
+			i = atoi(str2);
+		}
+
+		if (i < j) { return -1; }
+		if (i > j) { return  1; }
+	}
+
+	nRetVal = strcmp(str1, str2);
+
+	return nRetVal;
 }
 
 bool MainWindow::OnColumnClick(LPNMLISTVIEW pLVInfo)
@@ -261,7 +294,9 @@ bool MainWindow::OnColumnClick(LPNMLISTVIEW pLVInfo)
 	if (!bSortAscending)
 		lParamSort = -lParamSort;
 
-	ListView_SortItems(pLVInfo->hdr.hwndFrom, CompareListItems, lParamSort);
+	
+	temp = pLVInfo->hdr.hwndFrom;
+	ListView_SortItems(pLVInfo->hdr.hwndFrom, CompareListItems, lParamSort);	
 
 	return 0;
 
