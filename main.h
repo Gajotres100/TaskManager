@@ -3,9 +3,8 @@
 
 
 
-class NumberDialog : public Dialog {
+class NewTaskDialog : public Dialog {
 public:
-	int broj;
 protected:
 	int IDD();
 	bool OnInitDialog();

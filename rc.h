@@ -6,4 +6,5 @@
 #define IDC_BROWSE		107
 #define IDC_LV			109
 #define IDC_ENDPROCES	110
+#define IDD_TASK		111
 

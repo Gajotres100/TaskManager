@@ -8,16 +8,16 @@ HWND mainwindow;
 
 int CALLBACK CompareListItems(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
 
-int NumberDialog::IDD(){
-	return 0; 
+int NewTaskDialog::IDD(){
+	return IDD_TASK;
 }
 
-bool NumberDialog::OnInitDialog(){
-	
+bool NewTaskDialog::OnInitDialog()
+{	
 	return true;
 }
 
-bool NumberDialog::OnOK(){
+bool NewTaskDialog::OnOK(){
 	try
 	{		
 		return true;
@@ -27,8 +27,6 @@ bool NumberDialog::OnOK(){
 		return false;
 	}
 }
-
-
  
 void MainWindow::OnPaint(HDC hdc)
 {
@@ -66,11 +64,16 @@ int MainWindow::OnCreate(CREATESTRUCT* pcs)
 }
 
 void MainWindow::OnCommand(int id){		
-	int index;
-	NumberDialog ndl;
+	int index;	
+	NewTaskDialog  ndl;
 
 	switch(id){	
 		case ID_NEWTASK: 
+			if (ndl.DoModal(NULL, *this) == IDOK)
+			{
+				
+			}
+			InvalidateRect(*this, NULL, TRUE);			
 			break;
 		case LVN_COLUMNCLICK:
 			index = 0;
@@ -90,7 +93,7 @@ void MainWindow::OnCommand(int id){
 			break;
 	}
 
-	GetProcesses();
+	//GetProcesses();
 }
 
 void MainWindow::OnDestroy(){
@@ -243,7 +246,6 @@ bool MainWindow::KillProcess(int index)
 	return true;
 }
 
-
 int CALLBACK CompareListItems(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
 {
 	int nRetVal;
@@ -304,8 +306,6 @@ bool MainWindow::OnColumnClick(LPNMLISTVIEW pLVInfo)
 	return 0;
 
 }
-
-
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hp, LPSTR cmdLine, int nShow)
 {
