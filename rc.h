@@ -7,4 +7,4 @@
 #define IDC_LV			109
 #define IDC_ENDPROCES	110
 #define IDD_TASK		111
-
+#define IDC_TASKNAME	    112

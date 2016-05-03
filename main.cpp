@@ -18,14 +18,20 @@ bool NewTaskDialog::OnInitDialog()
 }
 
 bool NewTaskDialog::OnOK(){
-	try
-	{		
-		return true;
-	}
-	catch (XCtrl e)
+	char Data[265];
+	GetDlgItemText(*this, IDC_TASKNAME, Data, 512);
+
+	if (strcmp(Data, ""))
 	{
-		return false;
+		ShellExecute(NULL, NULL, Data, NULL, NULL, SW_SHOWNORMAL);
 	}
+
+	else
+	{
+		MessageBox(NULL, "Nije uneseno ime procesa !", "Pogrešna lokacija procesa na disku", MB_OK | MB_ICONWARNING);	
+	}
+
+	return true;
 }
  
 void MainWindow::OnPaint(HDC hdc)
@@ -43,8 +49,6 @@ void MainWindow::OnNotify(LPARAM lParam)
 
 int MainWindow::OnCreate(CREATESTRUCT* pcs)
 {
-	//HWND hwndList = GetDlgItem(Windows, IDC_LV);
-
 	mainwindow = *this;
 
 	ListProcesses.Create(*this, WS_CHILD | WS_VISIBLE | LVS_REPORT | LVS_EDITLABELS | WS_BORDER, "", IDC_LV, 0, 0, 500, 500);
@@ -71,7 +75,7 @@ void MainWindow::OnCommand(int id){
 		case ID_NEWTASK: 
 			if (ndl.DoModal(NULL, *this) == IDOK)
 			{
-				
+				index = 0;
 			}
 			InvalidateRect(*this, NULL, TRUE);			
 			break;
@@ -86,6 +90,9 @@ void MainWindow::OnCommand(int id){
 				index = SendMessage(ListProcesses, LVM_GETNEXTITEM, index, (LPARAM)LVNI_SELECTED);
 			}
 			break;		
+		case IDOK:
+			
+			break;
 		case ID_REFRESH:
 			break;			
 		case ID_EXIT: 
@@ -93,7 +100,7 @@ void MainWindow::OnCommand(int id){
 			break;
 	}
 
-	//GetProcesses();
+	GetProcesses();
 }
 
 void MainWindow::OnDestroy(){
