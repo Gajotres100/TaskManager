@@ -1,4 +1,4 @@
-#include "nwpwin.h"
+#include "win.h"
 #include <commctrl.h>
 
 

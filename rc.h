@@ -20,4 +20,4 @@
 #define IDS_COLL2		209
 #define IDS_COLL3		210
 #define IDS_COLL4		211
-#define IDS_ERORTERPROC	201
+#define IDS_ERKILLRPROC	212

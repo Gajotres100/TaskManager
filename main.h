@@ -1,5 +1,5 @@
-#include "nwpwin.h"
-#include "nwpdlg.h"
+#include "win.h"
+#include "dlg.h"
 
 
 

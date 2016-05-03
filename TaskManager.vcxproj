@@ -137,13 +137,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="nwpdlg.cpp" />
-    <ClCompile Include="nwpwin.cpp" />
+    <ClCompile Include="dlg.cpp" />
+    <ClCompile Include="win.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />
-    <ClInclude Include="nwpdlg.h" />
-    <ClInclude Include="nwpwin.h" />
+    <ClInclude Include="dlg.h" />
+    <ClInclude Include="win.h" />
     <ClInclude Include="rc.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>

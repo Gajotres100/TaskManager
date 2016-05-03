@@ -277,7 +277,7 @@ bool MainWindow::KillProcess(int index)
 
 	HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, 0, atoi(lvi.pszText));
 
-	LoadString(0, IDS_ERORTERPROC, s1, sizeof s1);
+	LoadString(0, IDS_ERKILLRPROC, s1, sizeof s1);
 	LoadString(0, IDS_EROR, s2, sizeof s2);
 
 	if (TerminateProcess(hProcess, 0) == 0)

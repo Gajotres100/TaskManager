@@ -1,6 +1,6 @@
 #include <windows.h>
 #include <tchar.h>
-#include "nwpdlg.h"
+#include "dlg.h"
 #include <map>
 
 int CALLBACK Dialog::Proc(HWND hw, UINT msg, WPARAM wp, LPARAM lp)

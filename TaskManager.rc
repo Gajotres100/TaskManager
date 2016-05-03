@@ -51,7 +51,7 @@ BEGIN
 	IDS_COLL2 "ProcesID"
 	IDS_COLL3 "Broj threadova"
 	IDS_COLL4 "Lokacija"
-	IDS_ERORTERPROC "Greška prilikom gašenja procesa"
+	IDS_ERKILLRPROC "Greška prilikom gašenja procesa"
 END
 
 
