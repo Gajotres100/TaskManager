@@ -6,6 +6,8 @@
 
 HWND mainwindow;
 
+char FilePath[260];
+
 int CALLBACK CompareListItems(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
 
 int NewTaskDialog::IDD(){
@@ -32,6 +34,32 @@ bool NewTaskDialog::OnOK(){
 	}
 
 	return true;
+}
+
+bool NewTaskDialog::OnCommand(int id, int code)
+{
+	if (id == IDC_BROWSE)
+	{
+		BrowseFile(*this);
+		if (strcmp(FilePath, "")) SetDlgItemText(*this, IDC_TASKNAME, FilePath);
+	}
+
+	return 0;
+}
+
+bool NewTaskDialog::BrowseFile(HWND hwnd)
+{
+	OPENFILENAME ofn;
+	ZeroMemory(&ofn, sizeof(ofn));
+	FilePath[0] = 0;
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = hwnd;
+	ofn.lpstrFilter = "Exe Files\0*.exe\0";
+	ofn.lpstrFile = FilePath;
+	ofn.nMaxFile = 260;
+	ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+	ofn.lpstrDefExt = "all";
+	GetOpenFileName(&ofn);
 }
  
 void MainWindow::OnPaint(HDC hdc)
@@ -99,6 +127,8 @@ void MainWindow::OnCommand(int id){
 			DestroyWindow(*this);
 			break;
 	}
+
+
 
 	GetProcesses();
 }

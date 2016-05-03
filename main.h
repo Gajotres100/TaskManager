@@ -9,6 +9,8 @@ protected:
 	int IDD();
 	bool OnInitDialog();
 	bool OnOK();
+	bool OnCommand(int id, int code);
+	bool BrowseFile(HWND);
 };
 
 class MainWindow : public Window {
