@@ -49,7 +49,6 @@ protected:
 	virtual void OnLButtonUp(POINT p)  { }
 	virtual void OnLButtonDblClk(POINT p)  { }
 	virtual void OnTimer(int id)  { }
-	virtual void OnPaint(HDC dc)  { }
 	virtual void OnNotify(LPARAM lParam)  { }
 };
 

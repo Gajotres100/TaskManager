@@ -38,4 +38,20 @@ BEGIN
 	PUSHBUTTON      "Browse", IDC_BROWSE, 163, 50, 50, 14
 END
 
+STRINGTABLE
+BEGIN
+	IDS_EROR "Greška"
+	IDS_EIMEPROC "Nije uneseno ime procesa !"
+	IDS_EXFILTER "Exe Files\0*.exe\0"
+	IDS_DEEXT "all"
+	IDS_ENDTASK "End Task"
+	IDS_REFRESH "Refresh"
+	IDS_EXTRASTYLE "fullrow header overflow"
+	IDS_COLL1 "Ime"
+	IDS_COLL2 "ProcesID"
+	IDS_COLL3 "Broj threadova"
+	IDS_COLL4 "Lokacija"
+	IDS_ERORTERPROC "Greška prilikom gašenja procesa"
+END
+
 

@@ -7,4 +7,17 @@
 #define IDC_LV			109
 #define IDC_ENDPROCES	110
 #define IDD_TASK		111
-#define IDC_TASKNAME	    112
+#define IDC_TASKNAME	112
+
+#define IDS_EROR		201
+#define IDS_EIMEPROC	202
+#define IDS_EXFILTER	203
+#define IDS_DEEXT   	204
+#define IDS_ENDTASK   	205
+#define IDS_REFRESH     206
+#define IDS_EXTRASTYLE  207
+#define IDS_COLL1		208
+#define IDS_COLL2		209
+#define IDS_COLL3		210
+#define IDS_COLL4		211
+#define IDS_ERORTERPROC	201

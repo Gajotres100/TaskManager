@@ -91,12 +91,6 @@ LRESULT CALLBACK Window::Proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPa
 		case WM_LBUTTONDBLCLK:	pThis->OnLButtonDblClk(GetPoint(lParam));	return 0;
 		case WM_TIMER:			pThis->OnTimer(wParam);						return 0;
 		case WM_NOTIFY:			pThis->OnNotify(lParam);			return 0;
-		case WM_PAINT:			
-			PAINTSTRUCT ps;
-			HDC hdc = BeginPaint(hwnd, &ps);
-			pThis->OnPaint(hdc);
-			EndPaint(hwnd, &ps);
-			return 0;
 
 	}
 	return ::DefWindowProc(hwnd, message, wParam, lParam);

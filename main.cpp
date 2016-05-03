@@ -7,6 +7,8 @@
 HWND mainwindow;
 
 char FilePath[260];
+char s1[128];
+char s2[128];
 
 int CALLBACK CompareListItems(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
 
@@ -21,16 +23,18 @@ bool NewTaskDialog::OnInitDialog()
 
 bool NewTaskDialog::OnOK(){
 	char Data[265];
+	LoadString(0, IDS_EIMEPROC, s1, sizeof s1);
+	LoadString(0, IDS_EROR, s2, sizeof s2);	
+
 	GetDlgItemText(*this, IDC_TASKNAME, Data, 512);
 
 	if (strcmp(Data, ""))
 	{
 		ShellExecute(NULL, NULL, Data, NULL, NULL, SW_SHOWNORMAL);
 	}
-
 	else
 	{
-		MessageBox(NULL, "Nije uneseno ime procesa !", "Pogrešna lokacija procesa na disku", MB_OK | MB_ICONWARNING);	
+		MessageBox(NULL, s1, s2, MB_OK | MB_ICONWARNING);	
 	}
 
 	return true;
@@ -49,22 +53,20 @@ bool NewTaskDialog::OnCommand(int id, int code)
 
 bool NewTaskDialog::BrowseFile(HWND hwnd)
 {
+	LoadString(0, IDS_EXFILTER, s1, sizeof s1);
+	LoadString(0, IDS_DEEXT, s2, sizeof s2);
+
 	OPENFILENAME ofn;
 	ZeroMemory(&ofn, sizeof(ofn));
 	FilePath[0] = 0;
 	ofn.lStructSize = sizeof(ofn);
 	ofn.hwndOwner = hwnd;
-	ofn.lpstrFilter = "Exe Files\0*.exe\0";
+	ofn.lpstrFilter = s1;
 	ofn.lpstrFile = FilePath;
 	ofn.nMaxFile = 260;
 	ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-	ofn.lpstrDefExt = "all";
+	ofn.lpstrDefExt = s2;
 	GetOpenFileName(&ofn);
-}
- 
-void MainWindow::OnPaint(HDC hdc)
-{
-	
 }
 
 void MainWindow::OnNotify(LPARAM lParam)
@@ -80,17 +82,22 @@ int MainWindow::OnCreate(CREATESTRUCT* pcs)
 	mainwindow = *this;
 
 	ListProcesses.Create(*this, WS_CHILD | WS_VISIBLE | LVS_REPORT | LVS_EDITLABELS | WS_BORDER, "", IDC_LV, 0, 0, 500, 500);
-
-	EndProcess.Create(*this, WS_CHILD | WS_VISIBLE | WS_BORDER, "End Task", IDC_ENDPROCES, 0, 510, 120, 40);
-	EndProcess.Create(*this, WS_CHILD | WS_VISIBLE | WS_BORDER, "Refresh now", ID_REFRESH, 130, 510, 120, 40);
-
+	LoadString(0, IDS_ENDTASK, s1, sizeof s1);
+	EndProcess.Create(*this, WS_CHILD | WS_VISIBLE | WS_BORDER, s1, IDC_ENDPROCES, 0, 510, 120, 40);
+	LoadString(0, IDS_REFRESH, s1, sizeof s1);
+	EndProcess.Create(*this, WS_CHILD | WS_VISIBLE | WS_BORDER, s1, ID_REFRESH, 130, 510, 120, 40);
 
 	ListView* lv = new ListView();
-	lv->SetExSyles("fullrow header overflow", ListProcesses);
-	lv->AddColumn(0, 190, "Ime", ListProcesses);
-	lv->AddColumn(1, 100, "ProcessID", ListProcesses);
-	lv->AddColumn(2, 120, "Broj threadova", ListProcesses);
-	lv->AddColumn(3, 350, "Lokacija", ListProcesses);
+	LoadString(0, IDS_EXTRASTYLE, s1, sizeof s1);
+	lv->SetExSyles(s1, ListProcesses);
+	LoadString(0, IDS_COLL1, s1, sizeof s1);
+	lv->AddColumn(0, 190, s1, ListProcesses);
+	LoadString(0, IDS_COLL2, s1, sizeof s1);
+	lv->AddColumn(1, 100, s1, ListProcesses);
+	LoadString(0, IDS_COLL3, s1, sizeof s1);
+	lv->AddColumn(2, 120, s1, ListProcesses);
+	LoadString(0, IDS_COLL4, s1, sizeof s1);
+	lv->AddColumn(3, 350, s1, ListProcesses);
 	GetProcesses();
 	return 0;
 }
@@ -127,9 +134,6 @@ void MainWindow::OnCommand(int id){
 			DestroyWindow(*this);
 			break;
 	}
-
-
-
 	GetProcesses();
 }
 
@@ -273,9 +277,12 @@ bool MainWindow::KillProcess(int index)
 
 	HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, 0, atoi(lvi.pszText));
 
+	LoadString(0, IDS_ERORTERPROC, s1, sizeof s1);
+	LoadString(0, IDS_EROR, s2, sizeof s2);
+
 	if (TerminateProcess(hProcess, 0) == 0)
 	{
-		MessageBox(NULL, "Terminating process failed !", "KillProcess", MB_OK | MB_ICONERROR);
+		MessageBox(NULL, s1, s2, MB_OK | MB_ICONERROR);
 	}
 
 	CloseHandle(hProcess);
@@ -349,7 +356,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hp, LPSTR cmdLine, int nShow)
 	Application app;
 	MainWindow* wnd = new MainWindow();
 
-	wnd->Create(NULL, WS_OVERLAPPEDWINDOW | WS_VISIBLE, "NWP", 
+	wnd->Create(NULL, WS_OVERLAPPEDWINDOW | WS_VISIBLE, "TM", 
 		(int)LoadMenu(hInstance, MAKEINTRESOURCE(IDM_MAIN)),0,0,520,630);
 
 	return app.Run();
