@@ -71,10 +71,20 @@ bool NewTaskDialog::BrowseFile(HWND hwnd)
 
 void MainWindow::OnNotify(LPARAM lParam)
 {
-	if ((((LPNMHDR)lParam)->idFrom == IDC_LV) && (((LPNMHDR)lParam)->code == LVN_COLUMNCLICK))
+	if ((((LPNMHDR)lParam)->idFrom == IDC_LV))
 	{
-		OnColumnClick((LPNMLISTVIEW)lParam);
+		switch (((LPNMHDR)lParam)->code)
+		{
+			case LVN_COLUMNCLICK:
+				OnColumnClick((LPNMLISTVIEW)lParam);
+				break;
+
+			case NM_RCLICK:
+				OnRowRMClick((LPNMLISTVIEW)lParam);				
+				break;
+		}	
 	}
+
 }
 
 int MainWindow::OnCreate(CREATESTRUCT* pcs)
@@ -349,6 +359,23 @@ bool MainWindow::OnColumnClick(LPNMLISTVIEW pLVInfo)
 
 	return 0;
 
+}
+
+bool MainWindow::OnRowRMClick(LPNMLISTVIEW pLVInfo)
+{
+	char retText[500];
+	int row = ((LPNMLISTVIEW)pLVInfo)->iItem;
+	LVITEM lvi;
+
+	lvi.mask = LVIF_TEXT | LVIF_STATE;
+	lvi.state = LVIS_SELECTED;
+	lvi.stateMask = LVIS_SELECTED;
+	lvi.iSubItem = 1;
+	lvi.pszText = retText;
+	lvi.cchTextMax = MAX_PATH;
+	lvi.iItem = row;
+	SendMessage(pLVInfo->hdr.hwndFrom, LVM_GETITEM, 0, (LPARAM)&lvi);
+	return 0;
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hp, LPSTR cmdLine, int nShow)

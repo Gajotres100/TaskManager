@@ -35,7 +35,7 @@ tstring Window::GenerateClassName()
 {
 	static int cnt=1;
 	TCHAR s[16];
-	_stprintf(s, _T("NWP%d"), cnt++);
+	_stprintf(s, _T("TM%d"), cnt++);
 	return tstring(s);
 }
 

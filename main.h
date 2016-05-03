@@ -29,6 +29,7 @@ public:
 	HWND GetFirstWindowText(char buf[], unsigned int max_out, int *text_written);
 	int GetNextWindowText(char buf[], unsigned int max_out, HWND* handle);
 	bool OnColumnClick(LPNMLISTVIEW pLVInfo);
+	bool OnRowRMClick(LPNMLISTVIEW pLVInfo);
 protected:
 	void OnCommand(int id);
 	void OnDestroy();
