@@ -69,6 +69,45 @@ bool NewTaskDialog::BrowseFile(HWND hwnd)
 	GetOpenFileName(&ofn);
 }
 
+int ProcessInfoDialog::IDD(){
+	return IDD_PROCESSINFO;
+}
+
+bool ProcessInfoDialog::OnInitDialog()
+{
+	SetDlgItemText(*this, IDS_COLL2, ProcessID);
+	return true;
+}
+
+bool ProcessInfoDialog::OnOK(){
+	char Data[265];
+	LoadString(0, IDS_EIMEPROC, s1, sizeof s1);
+	LoadString(0, IDS_EROR, s2, sizeof s2);
+
+	GetDlgItemText(*this, IDC_TASKNAME, Data, 512);
+
+	if (strcmp(Data, ""))
+	{
+		ShellExecute(NULL, NULL, Data, NULL, NULL, SW_SHOWNORMAL);
+	}
+	else
+	{
+		MessageBox(NULL, s1, s2, MB_OK | MB_ICONWARNING);
+	}
+
+	return true;
+}
+
+bool ProcessInfoDialog::OnCommand(int id, int code)
+{
+	if (id == IDC_BROWSE)
+	{
+		
+	}
+
+	return 0;
+}
+
 void MainWindow::OnNotify(LPARAM lParam)
 {
 	if ((((LPNMHDR)lParam)->idFrom == IDC_LV))
@@ -121,8 +160,7 @@ void MainWindow::OnCommand(int id){
 			if (ndl.DoModal(NULL, *this) == IDOK)
 			{
 				index = 0;
-			}
-			InvalidateRect(*this, NULL, TRUE);			
+			}		
 			break;
 		case LVN_COLUMNCLICK:
 			index = 0;
@@ -375,6 +413,14 @@ bool MainWindow::OnRowRMClick(LPNMLISTVIEW pLVInfo)
 	lvi.cchTextMax = MAX_PATH;
 	lvi.iItem = row;
 	SendMessage(pLVInfo->hdr.hwndFrom, LVM_GETITEM, 0, (LPARAM)&lvi);
+
+	ProcessInfoDialog  pid;
+	pid.ProcessID = retText;
+	if (pid.DoModal(NULL, *this) == IDOK)
+	{
+		
+	}
+	
 	return 0;
 }
 

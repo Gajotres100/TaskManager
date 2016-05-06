@@ -13,6 +13,16 @@ protected:
 	bool BrowseFile(HWND);
 };
 
+class ProcessInfoDialog : public Dialog {
+public:
+	char* ProcessID;
+protected:
+	int IDD();
+	bool OnInitDialog();
+	bool OnOK();
+	bool OnCommand(int id, int code);
+};
+
 class MainWindow : public Window {
 public:
 	MainWindow();
