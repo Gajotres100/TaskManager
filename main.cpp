@@ -4,7 +4,7 @@
 #include <commctrl.h>
 #include <psapi.h>
 
-HWND mainwindow;
+HWND listBoxHWND;
 
 char FilePath[260];
 char s1[128];
@@ -122,29 +122,16 @@ bool ProcessInfoDialog::OnInitDialog()
 }
 
 bool ProcessInfoDialog::OnOK(){
-	char Data[265];
-	LoadString(0, IDS_EIMEPROC, s1, sizeof s1);
-	LoadString(0, IDS_EROR, s2, sizeof s2);
-
-	GetDlgItemText(*this, IDC_TASKNAME, Data, 512);
-
-	if (strcmp(Data, ""))
-	{
-		ShellExecute(NULL, NULL, Data, NULL, NULL, SW_SHOWNORMAL);
-	}
-	else
-	{
-		MessageBox(NULL, s1, s2, MB_OK | MB_ICONWARNING);
-	}
-
 	return true;
 }
 
 bool ProcessInfoDialog::OnCommand(int id, int code)
 {
-	if (id == IDC_BROWSE)
+	if (id == IDC_ENDPROCES)
 	{
-		
+		MainWindow* wnd = new MainWindow();
+		wnd->KillProcess(index);
+		EndDialog(*this, IDC_ENDPROCES);
 	}
 
 	return 0;
@@ -161,22 +148,28 @@ void MainWindow::OnNotify(LPARAM lParam)
 				break;
 
 			case NM_RCLICK:
-				OnRowRMClick((LPNMLISTVIEW)lParam);				
+				OnRowRMClick((LPNMLISTVIEW)lParam);	
+				GetProcesses();
 				break;
+				
 		}	
 	}
+}
 
+void MainWindow::OnKeyDown(int i)
+{
+	int j = 0;
 }
 
 int MainWindow::OnCreate(CREATESTRUCT* pcs)
 {
-	mainwindow = *this;
-
 	ListProcesses.Create(*this, WS_CHILD | WS_VISIBLE | LVS_REPORT | LVS_EDITLABELS | WS_BORDER, "", IDC_LV, 0, 0, 500, 500);
 	LoadString(0, IDS_ENDTASK, s1, sizeof s1);
 	EndProcess.Create(*this, WS_CHILD | WS_VISIBLE | WS_BORDER, s1, IDC_ENDPROCES, 0, 510, 120, 40);
 	LoadString(0, IDS_REFRESH, s1, sizeof s1);
 	EndProcess.Create(*this, WS_CHILD | WS_VISIBLE | WS_BORDER, s1, ID_REFRESH, 130, 510, 120, 40);
+
+	listBoxHWND = ListProcesses;
 
 	ListView* lv = new ListView();
 	LoadString(0, IDS_EXTRASTYLE, s1, sizeof s1);
@@ -214,10 +207,7 @@ void MainWindow::OnCommand(int id){
 				KillProcess(index);
 				index = SendMessage(ListProcesses, LVM_GETNEXTITEM, index, (LPARAM)LVNI_SELECTED);
 			}
-			break;		
-		case IDOK:
-			
-			break;
+			break;	
 		case ID_REFRESH:
 			break;			
 		case ID_EXIT: 
@@ -363,7 +353,7 @@ bool MainWindow::KillProcess(int index)
 	lvi.cchTextMax = MAX_PATH;
 	lvi.iItem = index;
 
-	SendMessage(ListProcesses, LVM_GETITEM, 0, (LPARAM)&lvi);
+	SendMessage(listBoxHWND, LVM_GETITEM, 0, (LPARAM)&lvi);
 
 	HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, 0, atoi(lvi.pszText));
 
@@ -383,17 +373,15 @@ bool MainWindow::KillProcess(int index)
 int CALLBACK CompareListItems(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
 {
 	int nRetVal;
-
-	HWND hwndList = GetDlgItem(mainwindow, IDC_LV);
-
+	
 	bool isAsc = (lParamSort > 0);
 	int nColumn = abs(lParamSort) -1;
 
 	TCHAR str1[MAX_PATH];
 	TCHAR str2[MAX_PATH];
 
-	ListView_GetItemText(hwndList, lParam1, nColumn, str1, MAX_PATH);
-	ListView_GetItemText(hwndList, lParam2, nColumn, str2, MAX_PATH);
+	ListView_GetItemText(listBoxHWND, lParam1, nColumn, str1, MAX_PATH);
+	ListView_GetItemText(listBoxHWND, lParam2, nColumn, str2, MAX_PATH);
 
 	if (nColumn == 1 || nColumn == 2)
 	{
@@ -434,6 +422,8 @@ bool MainWindow::OnColumnClick(LPNMLISTVIEW pLVInfo)
 	lParamSort = 1 + nSortColumn;
 	if (!bSortAscending)
 		lParamSort = -lParamSort;
+
+	//GetProcesses();
 	
 	ListView_SortItems(pLVInfo->hdr.hwndFrom, CompareListItems, lParamSort);	
 
@@ -458,7 +448,8 @@ bool MainWindow::OnRowRMClick(LPNMLISTVIEW pLVInfo)
 
 	ProcessInfoDialog  pid;
 	pid.ProcessID = retText;
-	if (pid.DoModal(NULL, *this) == IDOK)
+	pid.index = row;
+	if (pid.DoModal(NULL, *this) == IDC_ENDPROCES)
 	{
 		
 	}

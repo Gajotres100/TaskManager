@@ -15,6 +15,7 @@ protected:
 
 class ProcessInfoDialog : public Dialog {
 public:
+	int index;
 	char* ProcessID;
 protected:
 	int IDD();
@@ -45,4 +46,5 @@ protected:
 	void OnDestroy();
 	int OnCreate(CREATESTRUCT* pcs);
 	void OnNotify(LPARAM lParam);
+	void OnKeyDown(int i);
 };

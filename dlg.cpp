@@ -16,7 +16,7 @@ int CALLBACK Dialog::Proc(HWND hw, UINT msg, WPARAM wp, LPARAM lp)
 	Dialog* pThis = wmap[hw];
 	if(msg == WM_COMMAND)
 	{
-		if(LOWORD(wp) == IDOK && pThis->OnOK())
+		if((LOWORD(wp) == IDOK && pThis->OnOK()))
 			return EndDialog(hw, IDOK);
 		if(LOWORD(wp) == IDCANCEL)
 		{
