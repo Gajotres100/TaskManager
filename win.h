@@ -100,8 +100,7 @@ public:
 
 		if (subItem != 0)
 		{
-			lvi.mask = LVIF_TEXT;
-			success = ListView_InsertItem(handle, &lvi);
+			lvi.mask = LVIF_TEXT;			
 			ListView_SetItem(handle, &lvi);
 		}
 		else{
