@@ -22,3 +22,6 @@
 #define IDS_COLL3		210
 #define IDS_COLL4		211
 #define IDS_ERKILLRPROC	212
+#define IDS_COLL5		213
+#define IDS_COLL6		214
+#define IDS_COLL7		215

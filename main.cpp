@@ -76,6 +76,48 @@ int ProcessInfoDialog::IDD(){
 bool ProcessInfoDialog::OnInitDialog()
 {
 	SetDlgItemText(*this, IDS_COLL2, ProcessID);
+
+	HANDLE hModuleSnap = INVALID_HANDLE_VALUE;
+	MODULEENTRY32 me32;
+
+	hModuleSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, atoi(ProcessID));
+	if (hModuleSnap == INVALID_HANDLE_VALUE)
+	{
+		return(false);
+	}
+
+	me32.dwSize = sizeof(MODULEENTRY32);
+	if (!Module32First(hModuleSnap, &me32))
+	{
+		CloseHandle(hModuleSnap);
+		return(false);
+	}
+
+	do
+	{
+		ListView* lv = new ListView();
+		char  vrijednost[500];
+		sprintf(vrijednost, "%s", me32.szExePath);
+		
+		SetDlgItemText(*this, IDS_COLL3, me32.szExePath);
+		SetDlgItemText(*this, IDS_COLL4, me32.szModule);
+
+		sprintf(vrijednost, "0x%08X", me32.modBaseAddr);
+		SetDlgItemText(*this, IDS_COLL5, vrijednost);
+
+		sprintf(vrijednost, "0x%04X", me32.ProccntUsage);
+		SetDlgItemText(*this, IDS_COLL6, vrijednost);
+
+		sprintf(vrijednost, "0x%04X", me32.GlblcntUsage);
+		SetDlgItemText(*this, IDS_COLL7, vrijednost);
+
+	} 
+	while (Module32Next(hModuleSnap, &me32));
+
+	CloseHandle(hModuleSnap);
+	return(true);
+
+
 	return true;
 }
 
