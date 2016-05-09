@@ -151,7 +151,14 @@ void MainWindow::OnNotify(LPARAM lParam)
 				OnRowRMClick((LPNMLISTVIEW)lParam);	
 				GetProcesses();
 				break;
+			case LVN_KEYDOWN:
+				LPNMLVKEYDOWN pNMLVKEYDOWN = (LPNMLVKEYDOWN)lParam;
+				if (pNMLVKEYDOWN->wVKey == VK_DELETE)
+				{
+					GetProcesses();
+				}
 				
+				break;				
 		}	
 	}
 }
@@ -283,6 +290,7 @@ bool MainWindow::GetProcesses()
 	while (Process32Next(hProcessSnap, &pe32));
 
 	CloseHandle(hProcessSnap);
+
 	return(true);
 }
 
