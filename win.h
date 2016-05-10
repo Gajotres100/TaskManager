@@ -65,9 +65,13 @@ protected:
 	virtual tstring ClassName(){ return tstring(_T("EDIT")); }
 };
 
+struct listItem {	
+	char path[MAX_PATH];
+};
+
 class ListView : public Window
 {
-public:
+public:	
 	std::string ClassName(){ return WC_LISTVIEW; }
 	bool AddColumn(int index, int width, char* title, HWND handle)
 	{
@@ -92,11 +96,15 @@ public:
 		for (int i = 0; i < strlen(value); ++i)
 			value[i] = tolower(value[i]);
 
+		listItem* pItem = new listItem();
+	
+		sprintf(pItem->path, value);
+	
 		lvi.iItem = item;
 		lvi.iSubItem = subItem;
 		lvi.cchTextMax = strlen(value);
-		lvi.pszText = value;
-		lvi.lParam = item;
+		lvi.pszText = value;	
+		lvi.lParam = (LPARAM)pItem;
 
 		if (subItem != 0)
 		{
@@ -106,6 +114,7 @@ public:
 		else{
 			lvi.mask = LVIF_TEXT | LVIF_PARAM;
 			success = ListView_InsertItem(handle, &lvi);
+			
 		}
 
 		return(success);

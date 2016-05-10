@@ -278,11 +278,51 @@ bool MainWindow::GetProcesses()
 			sprintf(procID, "%d", pe32.th32ProcessID);
 			sprintf(threadCount, "%d", pe32.cntThreads);
 
-			lv->AddItem(item, 0, pe32.szExeFile, ListProcesses);
+			/*lv->AddItem(item, 0, pe32.szExeFile, ListProcesses);
 			lv->AddItem(item, 1, procID, ListProcesses);
 			lv->AddItem(item, 2, threadCount, ListProcesses);
 
-			ListProcessModules(pe32.th32ProcessID, item);
+			ListProcessModules(pe32.th32ProcessID, item);*/
+
+			listItem* pItem = new listItem();
+
+			LV_ITEM newItem;
+			int insertIndex;
+
+			char * value = pe32.szExeFile;
+
+			for (int i = 0; i < strlen(value); ++i)
+				value[i] = tolower(value[i]);
+
+			insertIndex = ListView_GetItemCount(ListProcesses);
+
+			sprintf(pItem->path, value);
+			
+			newItem.mask = LVIF_TEXT | LVIF_PARAM;
+			newItem.iItem = insertIndex;
+			newItem.pszText = pe32.szExeFile;
+			newItem.cchTextMax = strlen(pe32.szExeFile);
+			newItem.iSubItem = 0;
+			newItem.lParam = (LPARAM)pItem;
+			insertIndex = SendMessage(ListProcesses, LVM_INSERTITEM, 0, (LPARAM)&newItem);
+
+			newItem.mask = LVIF_TEXT;
+			newItem.pszText = procID;
+			newItem.cchTextMax = strlen(procID);
+			newItem.iSubItem = 1;
+			SendMessage(ListProcesses, LVM_SETITEM, 0, (LPARAM)&newItem);
+
+			newItem.mask = LVIF_TEXT;
+			newItem.pszText = threadCount;
+			newItem.cchTextMax = strlen(threadCount);
+			newItem.iSubItem = 2;
+			SendMessage(ListProcesses, LVM_SETITEM, 0, (LPARAM)&newItem);
+
+			newItem.mask = LVIF_TEXT;
+			newItem.pszText = threadCount;
+			newItem.cchTextMax = strlen(threadCount);
+			newItem.iSubItem = 2;
+			SendMessage(ListProcesses, LVM_SETITEM, 0, (LPARAM)&newItem);
 
 			item++;
 		}
@@ -384,6 +424,10 @@ int CALLBACK CompareListItems(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
 	
 	bool isAsc = (lParamSort > 0);
 	int nColumn = abs(lParamSort) -1;
+	listItem *item1, *item2;
+
+	item1 = (listItem*)lParam1;
+	item2 = (listItem*)lParam2;
 
 	TCHAR str1[MAX_PATH];
 	TCHAR str2[MAX_PATH];
@@ -409,7 +453,10 @@ int CALLBACK CompareListItems(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
 		if (i > j) { return  1; }
 	}
 
-	nRetVal = strcmp(str1, str2);
+	if (isAsc)
+		nRetVal = strcmp(item1->path, item2->path);
+	else
+		nRetVal = strcmp(item2->path, item1->path);
 
 	return nRetVal;
 }
