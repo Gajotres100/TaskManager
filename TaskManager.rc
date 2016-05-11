@@ -10,7 +10,7 @@ IDM_MAIN MENU
 BEGIN
     POPUP "&File"
     BEGIN
-        MENUITEM "&Run new task",               ID_NEWTASK
+        MENUITEM "&Novi proces",               ID_NEWTASK
         MENUITEM SEPARATOR
         MENUITEM "E&xit",                       ID_EXIT
     END
@@ -64,7 +64,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Size"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-	LTEXT           "Open:", IDC_STATIC, 7, 19, 16, 13
+	LTEXT           "F1: pokreæe pomoæ\nEnd task: prekida rad procesa\n Del: prekid rada proce\nDesna tipka miša: Više informacija o procesu\nNovi proces: pokreæe novi proces", IDC_STATIC, 7, 19, 16, 13
 END
 
 
