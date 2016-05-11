@@ -137,6 +137,26 @@ bool ProcessInfoDialog::OnCommand(int id, int code)
 	return 0;
 }
 
+int HelpDialog::IDD(){
+	return IDD_HELP;
+}
+
+bool HelpDialog::OnInitDialog()
+{
+	
+
+	return true;
+}
+
+bool HelpDialog::OnOK(){
+	return true;
+}
+
+bool HelpDialog::OnCommand(int id, int code)
+{
+	return 0;
+}
+
 void MainWindow::OnNotify(LPARAM lParam)
 {
 	if ((((LPNMHDR)lParam)->idFrom == IDC_LV))
@@ -148,24 +168,36 @@ void MainWindow::OnNotify(LPARAM lParam)
 				break;
 
 			case NM_RCLICK:
-				OnRowRMClick((LPNMLISTVIEW)lParam);	
-				GetProcesses();
+				OnRowRMClick((LPNMLISTVIEW)lParam);					
 				break;
 			case LVN_KEYDOWN:
 				LPNMLVKEYDOWN pNMLVKEYDOWN = (LPNMLVKEYDOWN)lParam;
-				if (pNMLVKEYDOWN->wVKey == VK_DELETE)
+				if (pNMLVKEYDOWN->wVKey == VK_DELETE) OnDeletePress((LPNMLISTVIEW)lParam);	
+				else if (pNMLVKEYDOWN->wVKey == VK_F1)
 				{
-					GetProcesses();
+					HelpDialog  help;
+					if (help.DoModal(NULL, *this) == IDOK)
+					{
+
+					}
 				}
-				
 				break;				
 		}	
 	}
 }
 
-void MainWindow::OnKeyDown(int i)
+void MainWindow::OnKeyDown(int code)
 {
-	int j = 0;
+	switch (code)
+	{
+	case VK_F1:
+		HelpDialog  help;
+		if (help.DoModal(NULL, *this) == IDOK)
+		{
+
+		}
+		break;
+	}
 }
 
 int MainWindow::OnCreate(CREATESTRUCT* pcs)
@@ -259,7 +291,6 @@ bool MainWindow::GetProcesses()
 		CloseHandle(hProcessSnap);
 		return(FALSE);
 	}
-	int item = 0;
 	do
 	{
 		HANDLE hModuleSnap = INVALID_HANDLE_VALUE;
@@ -275,56 +306,51 @@ bool MainWindow::GetProcesses()
 
 		if (pe32.th32ProcessID > 0)
 		{
+			int insertIndex = ListView_GetItemCount(ListProcesses);
+
 			sprintf(procID, "%d", pe32.th32ProcessID);
-			sprintf(threadCount, "%d", pe32.cntThreads);
+			sprintf(threadCount, "%d", pe32.cntThreads);			
 
-			/*lv->AddItem(item, 0, pe32.szExeFile, ListProcesses);
-			lv->AddItem(item, 1, procID, ListProcesses);
-			lv->AddItem(item, 2, threadCount, ListProcesses);
-
-			ListProcessModules(pe32.th32ProcessID, item);*/
-
-			listItem* pItem = new listItem();
+			ListItem* pItem = new ListItem();
 
 			LV_ITEM newItem;
-			int insertIndex;
 
 			char * value = pe32.szExeFile;
 
 			for (int i = 0; i < strlen(value); ++i)
-				value[i] = tolower(value[i]);
+				value[i] = tolower(value[i]);			
 
-			insertIndex = ListView_GetItemCount(ListProcesses);
+			sprintf(pItem->szExeFile, value);
+			sprintf(pItem->procID, "%d", pe32.th32ProcessID);
+			sprintf(pItem->threadCount, "%d", pe32.cntThreads);
 
-			sprintf(pItem->path, value);
+			pItem = ListProcessModules(pe32.th32ProcessID, insertIndex, pItem);			
 			
 			newItem.mask = LVIF_TEXT | LVIF_PARAM;
 			newItem.iItem = insertIndex;
-			newItem.pszText = pe32.szExeFile;
-			newItem.cchTextMax = strlen(pe32.szExeFile);
+			newItem.pszText = pItem->szExeFile;
+			newItem.cchTextMax = strlen(pItem->szExeFile);
 			newItem.iSubItem = 0;
 			newItem.lParam = (LPARAM)pItem;
 			insertIndex = SendMessage(ListProcesses, LVM_INSERTITEM, 0, (LPARAM)&newItem);
 
 			newItem.mask = LVIF_TEXT;
-			newItem.pszText = procID;
-			newItem.cchTextMax = strlen(procID);
+			newItem.pszText = pItem->procID;
+			newItem.cchTextMax = strlen(pItem->procID);
 			newItem.iSubItem = 1;
 			SendMessage(ListProcesses, LVM_SETITEM, 0, (LPARAM)&newItem);
 
 			newItem.mask = LVIF_TEXT;
-			newItem.pszText = threadCount;
-			newItem.cchTextMax = strlen(threadCount);
+			newItem.pszText = pItem->threadCount;
+			newItem.cchTextMax = strlen(pItem->threadCount);
 			newItem.iSubItem = 2;
 			SendMessage(ListProcesses, LVM_SETITEM, 0, (LPARAM)&newItem);
 
 			newItem.mask = LVIF_TEXT;
-			newItem.pszText = threadCount;
-			newItem.cchTextMax = strlen(threadCount);
-			newItem.iSubItem = 2;
+			newItem.pszText = pItem->location;
+			newItem.cchTextMax = strlen(pItem->location);
+			newItem.iSubItem = 3;
 			SendMessage(ListProcesses, LVM_SETITEM, 0, (LPARAM)&newItem);
-
-			item++;
 		}
 	} 
 	while (Process32Next(hProcessSnap, &pe32));
@@ -334,7 +360,7 @@ bool MainWindow::GetProcesses()
 	return(true);
 }
 
-bool MainWindow::ListProcessModules(DWORD dwPID, int subitemIndex)
+ListItem* MainWindow::ListProcessModules(DWORD dwPID, int subitemIndex, ListItem* pItem)
 {
 	HANDLE hModuleSnap = INVALID_HANDLE_VALUE;
 	MODULEENTRY32 me32;
@@ -342,26 +368,29 @@ bool MainWindow::ListProcessModules(DWORD dwPID, int subitemIndex)
 	hModuleSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, dwPID);
 	if (hModuleSnap == INVALID_HANDLE_VALUE)
 	{
-		return(false);
+		return pItem;
 	}
 
 	me32.dwSize = sizeof(MODULEENTRY32);
 	if (!Module32First(hModuleSnap, &me32))
 	{
 		CloseHandle(hModuleSnap);
-		return(false);
+		return pItem;
 	}
 
 	do
 	{
-		ListView* lv = new ListView();
 		char  lokacija[500];
-		sprintf(lokacija, "%s", me32.szExePath);
-		lv->AddItem(subitemIndex, 3, lokacija, ListProcesses);
+		char* value = me32.szExePath;
+
+		for (int i = 0; i < strlen(value); ++i)
+			value[i] = tolower(value[i]);
+
+		sprintf(pItem->location, value);
 	} while (Module32Next(hModuleSnap, &me32));
 
 	CloseHandle(hModuleSnap);
-	return(true);
+	return pItem;
 }
 
 bool MainWindow::PrintMemoryInfo(DWORD processID, int subitemIndex)
@@ -380,7 +409,7 @@ bool MainWindow::PrintMemoryInfo(DWORD processID, int subitemIndex)
 		char workingSetSize[50];
 		sprintf(workingSetSize, "%d", pmc.PagefileUsage);
 		ListView* lv = new ListView();
-		lv->AddItem(subitemIndex, 3, workingSetSize, ListProcesses);
+		//lv->AddItem(subitemIndex, 3, workingSetSize, ListProcesses);
 	}
 
 	CloseHandle(hProcess);
@@ -420,45 +449,54 @@ bool MainWindow::KillProcess(int index)
 
 int CALLBACK CompareListItems(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
 {
-	int nRetVal;
-	
 	bool isAsc = (lParamSort > 0);
 	int nColumn = abs(lParamSort) -1;
-	listItem *item1, *item2;
+	ListItem *item1, *item2;
 
-	item1 = (listItem*)lParam1;
-	item2 = (listItem*)lParam2;
-
-	TCHAR str1[MAX_PATH];
-	TCHAR str2[MAX_PATH];
-
-	ListView_GetItemText(listBoxHWND, lParam1, nColumn, str1, MAX_PATH);
-	ListView_GetItemText(listBoxHWND, lParam2, nColumn, str2, MAX_PATH);
-
-	if (nColumn == 1 || nColumn == 2)
+	item1 = (ListItem*)lParam1;
+	item2 = (ListItem*)lParam2;
+	
+	if (nColumn == 0)
 	{
-		int i = 0, j = 0;
+		if (isAsc)
+			return strcmp(item2->szExeFile, item1->szExeFile);			
+		else
+			return strcmp(item1->szExeFile, item2->szExeFile);
+	}
+	else if (nColumn == 1)
+	{
+		
 		if (isAsc)
 		{
-			i = atoi(str1);
-			j = atoi(str2);
+			if (atoi(item1->procID) < atoi(item2->procID)) { return -1; }
+			if (atoi(item1->procID) > atoi(item2->procID)) { return  1; }
 		}
 		else
 		{
-			j = atoi(str1);
-			i = atoi(str2);
+			if (atoi(item2->procID) < atoi(item1->procID)) { return -1; }
+			if (atoi(item2->procID) > atoi(item1->procID)) { return  1; }
 		}
-
-		if (i < j) { return -1; }
-		if (i > j) { return  1; }
 	}
-
-	if (isAsc)
-		nRetVal = strcmp(item1->path, item2->path);
-	else
-		nRetVal = strcmp(item2->path, item1->path);
-
-	return nRetVal;
+	else if (nColumn == 2)
+	{
+		if (isAsc)
+		{
+			if (atoi(item1->threadCount) < atoi(item2->threadCount)) { return -1; }
+			if (atoi(item1->threadCount) > atoi(item2->threadCount)) { return  1; }
+		}
+		else
+		{
+			if (atoi(item2->threadCount) < atoi(item1->threadCount)) { return -1; }
+			if (atoi(item2->threadCount) > atoi(item1->threadCount)) { return  1; }
+		}
+	}
+	else if (nColumn == 3)
+	{
+		if (isAsc)
+			return strcmp(item1->szExeFile, item2->szExeFile);
+		else
+			return strcmp(item2->szExeFile, item1->szExeFile);
+	}
 }
 
 bool MainWindow::OnColumnClick(LPNMLISTVIEW pLVInfo)
@@ -477,8 +515,6 @@ bool MainWindow::OnColumnClick(LPNMLISTVIEW pLVInfo)
 	lParamSort = 1 + nSortColumn;
 	if (!bSortAscending)
 		lParamSort = -lParamSort;
-
-	//GetProcesses();
 	
 	ListView_SortItems(pLVInfo->hdr.hwndFrom, CompareListItems, lParamSort);	
 
@@ -508,7 +544,19 @@ bool MainWindow::OnRowRMClick(LPNMLISTVIEW pLVInfo)
 	{
 		
 	}
-	
+	GetProcesses();
+	return 0;
+}
+
+bool MainWindow::OnDeletePress(LPNMLISTVIEW pLVInfo)
+{
+	int index = SendMessage(pLVInfo->hdr.hwndFrom, LVM_GETNEXTITEM, (WPARAM)-1, (LPARAM)LVNI_SELECTED);
+	while (index != -1)
+	{
+		KillProcess(index);
+		index = SendMessage(pLVInfo->hdr.hwndFrom, LVM_GETNEXTITEM, index, (LPARAM)LVNI_SELECTED);
+	}
+	GetProcesses();
 	return 0;
 }
 

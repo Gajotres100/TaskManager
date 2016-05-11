@@ -9,6 +9,7 @@
 #define IDD_TASK		111
 #define IDC_TASKNAME	112
 #define IDD_PROCESSINFO	113
+#define IDD_HELP		114
 
 #define IDS_EROR		201
 #define IDS_EIMEPROC	202

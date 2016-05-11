@@ -17,6 +17,48 @@ tstring Window::ClassName()
 	return tstring();
 }
 
+bool ListView::AddColumn(int index, int width, char* title, HWND handle)
+{
+	bool success = false;
+	LVCOLUMN lvc;
+	lvc.mask = LVCF_FMT | LVCF_SUBITEM | LVCF_TEXT | LVCF_WIDTH;
+	lvc.fmt = LVCFMT_LEFT;
+	lvc.cx = width;
+	lvc.iSubItem = index;
+	lvc.pszText = title;
+	lvc.cchTextMax = strlen(title);
+	success = ListView_InsertColumn(handle, index, &lvc);
+	
+	return(success);
+}
+
+
+void ListView::SetExSyles(char* styles, HWND handle)
+{
+	DWORD exflags = WS_EX_LEFT;
+
+	if (strstr(styles, "fullrow") || strstr(styles, "fullrowsel") ||
+		strstr(styles, "full row") || strstr(styles, "full sel"))
+	{
+		exflags |= LVS_EX_FULLROWSELECT;
+	}
+
+	if (strstr(styles, "header"))
+	{
+		exflags |= LVS_EX_HEADERINALLVIEWS;
+	}
+
+	if (strstr(styles, "overflow"))
+	{
+		exflags |= LVS_EX_COLUMNOVERFLOW;
+	}
+
+	if (handle)
+	{
+		SendMessage(handle, LVM_SETEXTENDEDLISTVIEWSTYLE, exflags, exflags);
+	}
+}
+
 bool Window::Register(const tstring& name)
 {
 	WNDCLASS wc; ZeroMemory(&wc, sizeof wc);

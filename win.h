@@ -65,86 +65,19 @@ protected:
 	virtual tstring ClassName(){ return tstring(_T("EDIT")); }
 };
 
-struct listItem {	
-	char path[MAX_PATH];
+struct ListItem {	
+	char szExeFile[MAX_PATH];
+	char procID[MAX_PATH];
+	char threadCount[MAX_PATH];
+	char location[MAX_PATH];
 };
 
 class ListView : public Window
 {
 public:	
+	virtual bool AddColumn(int index, int width, char* title, HWND handle);
+	virtual void SetExSyles(char* styles, HWND handle);
 	std::string ClassName(){ return WC_LISTVIEW; }
-	bool AddColumn(int index, int width, char* title, HWND handle)
-	{
-		bool success = false;
-		LVCOLUMN lvc;
-		lvc.mask = LVCF_FMT | LVCF_SUBITEM | LVCF_TEXT | LVCF_WIDTH;
-		lvc.fmt = LVCFMT_LEFT;
-		lvc.cx = width;
-		lvc.iSubItem = index;
-		lvc.pszText = title;
-		lvc.cchTextMax = strlen(title);
-		success = ListView_InsertColumn(handle, index, &lvc);
-		
-		return(success);
-	}
-
-	bool AddItem(int item, int subItem, char* value, HWND handle)
-	{
-		bool success = false;
-		LVITEM lvi;		
-
-		for (int i = 0; i < strlen(value); ++i)
-			value[i] = tolower(value[i]);
-
-		listItem* pItem = new listItem();
-	
-		sprintf(pItem->path, value);
-	
-		lvi.iItem = item;
-		lvi.iSubItem = subItem;
-		lvi.cchTextMax = strlen(value);
-		lvi.pszText = value;	
-		lvi.lParam = (LPARAM)pItem;
-
-		if (subItem != 0)
-		{
-			lvi.mask = LVIF_TEXT;			
-			ListView_SetItem(handle, &lvi);
-		}
-		else{
-			lvi.mask = LVIF_TEXT | LVIF_PARAM;
-			success = ListView_InsertItem(handle, &lvi);
-			
-		}
-
-		return(success);
-	}
-
-	void SetExSyles(char* styles, HWND handle)
-	{
-		DWORD exflags = WS_EX_LEFT;
-
-		if (strstr(styles, "fullrow") || strstr(styles, "fullrowsel") ||
-			strstr(styles, "full row") || strstr(styles, "full sel"))
-		{
-			exflags |= LVS_EX_FULLROWSELECT;
-		}
-
-		if (strstr(styles, "header"))
-		{
-			exflags |= LVS_EX_HEADERINALLVIEWS;
-		}
-
-		if (strstr(styles, "overflow"))
-		{
-			exflags |= LVS_EX_COLUMNOVERFLOW;
-		}
-
-		if (handle)
-		{
-			SendMessage(handle, LVM_SETEXTENDEDLISTVIEWSTYLE, exflags, exflags);
-		}
-	}
 };
 
 class ListBox : public Window
