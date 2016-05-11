@@ -228,6 +228,8 @@ int MainWindow::OnCreate(CREATESTRUCT* pcs)
 void MainWindow::OnCommand(int id){		
 	int index;	
 	NewTaskDialog  ndl;
+	HMENU hMenu = GetMenu(*this);
+	MENUITEMINFO mii = { sizeof(MENUITEMINFO) };
 
 	switch(id){	
 		case ID_NEWTASK: 
@@ -248,7 +250,13 @@ void MainWindow::OnCommand(int id){
 			}
 			break;	
 		case ID_REFRESH:
-			break;			
+			break;		
+		case ID_EXPAND:			
+			mii.fMask = MIIM_STATE;
+			GetMenuItemInfo(hMenu, ID_EXPAND, FALSE, &mii);
+			mii.fState ^= MFS_CHECKED;
+			SetMenuItemInfo(hMenu, ID_EXPAND, FALSE, &mii);
+			break;
 		case ID_EXIT: 
 			DestroyWindow(*this);
 			break;
@@ -269,14 +277,18 @@ bool MainWindow::GetProcesses()
 	SendMessage(ListProcesses, LVM_DELETEALLITEMS, 0, 0);
 
 	char szText[64];
-	int nCol, nItem, nSubItem;
-	LVCOLUMN lvc;
 	LVITEM lvi;
 
 	HANDLE hProcessSnap;
 	HANDLE hProcess;
 	PROCESSENTRY32 pe32;
 	DWORD dwPriorityClass;
+
+
+	HMENU hMenu = GetMenu(*this);
+	MENUITEMINFO mii = { sizeof(MENUITEMINFO) };
+	mii.fMask = MIIM_STATE;
+	GetMenuItemInfo(hMenu, ID_EXPAND, FALSE, &mii);
 
 	hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 	if (hProcessSnap == INVALID_HANDLE_VALUE)
@@ -295,21 +307,19 @@ bool MainWindow::GetProcesses()
 	{
 		HANDLE hModuleSnap = INVALID_HANDLE_VALUE;
 		hModuleSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, pe32.th32ProcessID);
-		if (hModuleSnap == INVALID_HANDLE_VALUE)
+		if (hModuleSnap == INVALID_HANDLE_VALUE && mii.fState != MFS_CHECKED)
 		{
 			continue;
 		}
 
 		hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pe32.th32ProcessID);
 		ListView* lv = new ListView();
-		char procID[50],threadCount[50], priority[50];
+	
 
 		if (pe32.th32ProcessID > 0)
 		{
 			int insertIndex = ListView_GetItemCount(ListProcesses);
-
-			sprintf(procID, "%d", pe32.th32ProcessID);
-			sprintf(threadCount, "%d", pe32.cntThreads);			
+			
 
 			ListItem* pItem = new ListItem();
 
@@ -432,10 +442,10 @@ bool MainWindow::KillProcess(int index)
 
 	SendMessage(listBoxHWND, LVM_GETITEM, 0, (LPARAM)&lvi);
 
-	HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, 0, atoi(lvi.pszText));
+	HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, 0, atoi(lvi.pszText));
 
 	LoadString(0, IDS_ERKILLRPROC, s1, sizeof s1);
-	LoadString(0, IDS_EROR, s2, sizeof s2);
+	LoadString(0, IDS_EROR, s2, sizeof s2);	
 
 	if (TerminateProcess(hProcess, 0) == 0)
 	{

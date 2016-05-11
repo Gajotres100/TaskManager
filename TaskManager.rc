@@ -17,6 +17,7 @@ BEGIN
     POPUP "&View"
     BEGIN
         MENUITEM "&Refresh",                    ID_REFRESH
+		MENUITEM "&Prikaži servise"				ID_EXPAND
     END
 END
 
@@ -59,12 +60,12 @@ BEGIN
 	PUSHBUTTON      "Cancel", IDCANCEL, 85, 125, 70, 15
 END
 
-IDD_HELP DIALOGEX 100, 100, 120, 93
+IDD_HELP DIALOGEX 100, 100, 150, 104
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Help"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-LTEXT           "F1: pokreæe pomoæ\n\nEnd task: prekida rad procesa\n\nDel: prekid rada proce\n\nDesna tipka miša: Više informacija o procesu\n\nNovi proces: pokreæe novi proces\n\nRefresh: osvježava popis procesa", IDC_STATIC, 6, 7, 112, 84
+LTEXT           "F1: pokreæe pomoæ\n\nEnd task: prekida rad procesa\n\nDel: prekid rada proce\n\nDesna tipka miša: Više informacija o procesu\n\nNovi proces: pokreæe novi proces\n\nRefresh: osvježava popis procesa", IDC_STATIC, 4, 7, 146, 97
 END
 
 
