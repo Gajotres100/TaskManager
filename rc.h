@@ -27,3 +27,5 @@
 #define IDS_COLL5		213
 #define IDS_COLL6		214
 #define IDS_COLL7		215
+
+#define IDI_ICON1		301

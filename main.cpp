@@ -575,7 +575,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hp, LPSTR cmdLine, int nShow)
 	Application app;
 	MainWindow* wnd = new MainWindow();
 
-	wnd->Create(NULL, WS_OVERLAPPEDWINDOW | WS_VISIBLE, "TM", 
+	wnd->Create(NULL, WS_OVERLAPPED | WS_SYSMENU | WS_VISIBLE, "TM",
 		(int)LoadMenu(hInstance, MAKEINTRESOURCE(IDM_MAIN)),0,0,520,630);
 
 	return app.Run();
