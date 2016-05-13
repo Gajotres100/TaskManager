@@ -13,13 +13,12 @@ char s2[128];
 
 int CALLBACK CompareListItems(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
 
-int NewTaskDialog::IDD(){
-	return IDD_TASK;
+int AboutDialog::IDD(){
+	return IDD_ABOUT;
 }
 
-bool NewTaskDialog::OnInitDialog()
-{	
-	return true;
+int NewTaskDialog::IDD(){
+	return IDD_TASK;
 }
 
 bool NewTaskDialog::OnOK(){
@@ -116,13 +115,6 @@ bool ProcessInfoDialog::OnInitDialog()
 	while (Module32Next(hModuleSnap, &me32));
 
 	CloseHandle(hModuleSnap);
-	return(true);
-
-
-	return true;
-}
-
-bool ProcessInfoDialog::OnOK(){
 	return true;
 }
 
@@ -140,22 +132,6 @@ bool ProcessInfoDialog::OnCommand(int id, int code)
 
 int HelpDialog::IDD(){
 	return IDD_HELP;
-}
-
-bool HelpDialog::OnInitDialog()
-{
-	
-
-	return true;
-}
-
-bool HelpDialog::OnOK(){
-	return true;
-}
-
-bool HelpDialog::OnCommand(int id, int code)
-{
-	return 0;
 }
 
 void MainWindow::OnNotify(LPARAM lParam)
@@ -229,6 +205,8 @@ int MainWindow::OnCreate(CREATESTRUCT* pcs)
 void MainWindow::OnCommand(int id){		
 	int index;	
 	NewTaskDialog  ndl;
+	HelpDialog  help;
+	AboutDialog about;
 	HMENU hMenu = GetMenu(*this);
 	MENUITEMINFO mii = { sizeof(MENUITEMINFO) };
 
@@ -252,12 +230,17 @@ void MainWindow::OnCommand(int id){
 			break;	
 		case ID_REFRESH:
 			break;		
+		case IDD_HELP:
+			if (help.DoModal(NULL, *this) == IDOK){	}
+			break;
 		case ID_EXPAND:			
 			mii.fMask = MIIM_STATE;
 			GetMenuItemInfo(hMenu, ID_EXPAND, FALSE, &mii);
 			mii.fState ^= MFS_CHECKED;
 			SetMenuItemInfo(hMenu, ID_EXPAND, FALSE, &mii);
 			break;
+		case ID_ABOUT:
+			if (about.DoModal(NULL, *this) == IDOK){}
 		case ID_EXIT: 
 			DestroyWindow(*this);
 			break;
@@ -451,8 +434,8 @@ bool MainWindow::KillProcess(int index)
 		SC_HANDLE SCManager = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
 		if (SCManager == NULL)
 		{
-			LoadString(0, IDS_ERKILLRPROC, s1, sizeof s1);
-			MessageBox(NULL, "Pokrenite aplikacijui kao administrator", s2, MB_OK | MB_ICONERROR);
+			LoadString(0, IDS_NORIGHTS, s1, sizeof s1);
+			MessageBox(NULL, s1, s2, MB_OK | MB_ICONERROR);
 			return false;
 		}
 

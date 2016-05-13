@@ -7,10 +7,15 @@ class NewTaskDialog : public Dialog {
 public:
 protected:
 	int IDD();
-	bool OnInitDialog();
 	bool OnOK();
 	bool OnCommand(int id, int code);
 	bool BrowseFile(HWND);
+};
+
+class AboutDialog : public Dialog {
+public:
+protected:
+	int IDD();
 };
 
 class ProcessInfoDialog : public Dialog {
@@ -20,7 +25,6 @@ public:
 protected:
 	int IDD();
 	bool OnInitDialog();
-	bool OnOK();
 	bool OnCommand(int id, int code);
 };
 
@@ -29,9 +33,6 @@ public:
 	
 protected:
 	int IDD();
-	bool OnInitDialog();
-	bool OnOK();
-	bool OnCommand(int id, int code);
 };
 
 class MainWindow : public Window {

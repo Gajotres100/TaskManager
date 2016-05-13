@@ -11,6 +11,8 @@
 #define IDD_PROCESSINFO	113
 #define IDD_HELP		114
 #define ID_EXPAND		115
+#define ID_ABOUT		116
+#define IDD_ABOUT		117
 
 #define IDS_EROR		201
 #define IDS_EIMEPROC	202
