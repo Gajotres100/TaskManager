@@ -29,8 +29,7 @@ protected:
 };
 
 class HelpDialog : public Dialog {
-public:
-	
+public:	
 protected:
 	int IDD();
 };

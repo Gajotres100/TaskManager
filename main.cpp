@@ -241,6 +241,7 @@ void MainWindow::OnCommand(int id){
 			break;
 		case ID_ABOUT:
 			if (about.DoModal(NULL, *this) == IDOK){}
+			break;
 		case ID_EXIT: 
 			DestroyWindow(*this);
 			break;
