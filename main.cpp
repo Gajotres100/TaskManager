@@ -3,6 +3,7 @@
 #include <tlhelp32.h>
 #include <commctrl.h>
 #include <psapi.h>
+#include <vector>
 
 HWND listBoxHWND;
 
@@ -428,6 +429,7 @@ bool MainWindow::PrintMemoryInfo(DWORD processID, int subitemIndex)
 bool MainWindow::KillProcess(int index)
 {
 	char retText[500];
+	LoadString(0, IDS_EROR, s2, sizeof s2);
 
 	int report;
 	LVITEM lvi;
@@ -442,19 +444,110 @@ bool MainWindow::KillProcess(int index)
 
 	SendMessage(listBoxHWND, LVM_GETITEM, 0, (LPARAM)&lvi);
 
-	HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, 0, atoi(lvi.pszText));
-
-	LoadString(0, IDS_ERKILLRPROC, s1, sizeof s1);
-	LoadString(0, IDS_EROR, s2, sizeof s2);	
-
-	if (TerminateProcess(hProcess, 0) == 0)
+	HANDLE hModuleSnap = INVALID_HANDLE_VALUE;
+	hModuleSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, atoi(lvi.pszText));
+	if (hModuleSnap == INVALID_HANDLE_VALUE)
 	{
-		MessageBox(NULL, s1, s2, MB_OK | MB_ICONERROR);
+		SC_HANDLE SCManager = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
+		if (SCManager == NULL)
+		{
+			LoadString(0, IDS_ERKILLRPROC, s1, sizeof s1);
+			MessageBox(NULL, "Pokrenite aplikacijui kao administrator", s2, MB_OK | MB_ICONERROR);
+			return false;
+		}
+
+		tstring service;
+		if (EnumerateServices(atoi(lvi.pszText)).empty())
+		{
+			LoadString(0, IDS_UNABLEKILLRSERV, s1, sizeof s1);
+			MessageBox(NULL, s1, s2, MB_OK | MB_ICONERROR);
+			return false;
+		}
+		service = EnumerateServices(atoi(lvi.pszText));
+		SERVICE_STATUS Status;
+
+		SC_HANDLE SHandle = OpenService(SCManager, service.c_str() , SC_MANAGER_ALL_ACCESS);
+
+		if (SHandle == NULL)
+		{
+			LoadString(0, IDS_UNABLEKILLRSERV, s1, sizeof s1);
+			MessageBox(NULL, s1, s2, MB_OK | MB_ICONERROR);		
+		}
+		else if (!ControlService(SHandle, SERVICE_CONTROL_STOP, &Status))
+		{
+			LoadString(0, IDS_ERKILLRSERV, s1, sizeof s1);
+			MessageBox(NULL, s1, s2, MB_OK | MB_ICONERROR);
+		}
+
+		CloseServiceHandle(SCManager);
+		CloseServiceHandle(SHandle);
 	}
 
-	CloseHandle(hProcess);
+	else
+	{
+		HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, 0, atoi(lvi.pszText));
 
+		LoadString(0, IDS_ERKILLRPROC, s1, sizeof s1);		
+
+		if (TerminateProcess(hProcess, 0) == 0)
+		{
+			MessageBox(NULL, s1, s2, MB_OK | MB_ICONERROR);
+		}
+
+		CloseHandle(hProcess);
+	}
 	return true;
+}
+
+tstring MainWindow::EnumerateServices(DWORD processId)
+{
+	SC_HANDLE hSCM = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
+	
+	if (hSCM == NULL)
+	{
+		return NULL;
+	}
+
+	DWORD bufferSize = 0;
+	DWORD requiredBufferSize = 0;
+	DWORD totalServicesCount = 0;
+	EnumServicesStatusEx(hSCM, 	SC_ENUM_PROCESS_INFO,
+		SERVICE_WIN32,
+		SERVICE_STATE_ALL,
+		nullptr,
+		bufferSize,
+		&requiredBufferSize,
+		&totalServicesCount,
+		nullptr,
+		nullptr);
+
+	std::vector<BYTE> buffer(requiredBufferSize);
+	EnumServicesStatusEx(hSCM,
+		SC_ENUM_PROCESS_INFO,
+		SERVICE_WIN32,
+		SERVICE_STATE_ALL,
+		buffer.data(),
+		buffer.size(),
+		&requiredBufferSize,
+		&totalServicesCount,
+		nullptr,
+		nullptr);
+
+	LPENUM_SERVICE_STATUS_PROCESS services =
+		reinterpret_cast<LPENUM_SERVICE_STATUS_PROCESS>(buffer.data());
+	for (unsigned int i = 0; i < totalServicesCount; ++i)
+	{
+		ENUM_SERVICE_STATUS_PROCESS service = services[i];
+		if (service.ServiceStatusProcess.dwProcessId == processId)
+		{
+			(void)CloseServiceHandle(hSCM);
+			return service.lpServiceName;
+		}
+	}
+
+	(void)CloseServiceHandle(hSCM);
+	
+	return "";
 }
 
 int CALLBACK CompareListItems(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)

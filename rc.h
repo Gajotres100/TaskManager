@@ -27,5 +27,8 @@
 #define IDS_COLL5		213
 #define IDS_COLL6		214
 #define IDS_COLL7		215
+#define IDS_ERKILLRSERV	216
+#define IDS_UNABLEKILLRSERV  217
+#define IDS_NORIGHTS	218
 
 #define IDI_ICON1		301

@@ -52,6 +52,7 @@ public:
 	bool OnColumnClick(LPNMLISTVIEW pLVInfo);
 	bool OnRowRMClick(LPNMLISTVIEW pLVInfo);
 	bool OnDeletePress(LPNMLISTVIEW pLVInfo);
+	tstring EnumerateServices(DWORD processId);
 protected:
 	void OnCommand(int id);
 	void OnDestroy();

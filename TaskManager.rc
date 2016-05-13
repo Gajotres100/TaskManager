@@ -84,6 +84,9 @@ BEGIN
 	IDS_COLL3 "Broj threadova"
 	IDS_COLL4 "Lokacija"
 	IDS_ERKILLRPROC "Greška prilikom gašenja procesa"
+	IDS_ERKILLRSERV "Greška prilikom gašenja servisa"
+	IDS_UNABLEKILLRSERV "Servis nije moguæe ugasiti"
+	IDS_NORIGHTS "Pokrenite aplikacijui kao administrator"
 END
 
 IDI_ICON1               ICON                    "icon1.ico"
