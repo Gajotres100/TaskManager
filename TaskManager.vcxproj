@@ -145,13 +145,9 @@
     <ClInclude Include="dlg.h" />
     <ClInclude Include="win.h" />
     <ClInclude Include="rc.h" />
-    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TaskManager.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="icon1.ico" />

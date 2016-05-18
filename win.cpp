@@ -17,7 +17,7 @@ tstring Window::ClassName()
 	return tstring();
 }
 
-bool ListView::AddColumn(int index, int width, char* title, HWND handle)
+bool ListView::AddColumn(int index, int width, TCHAR* title, HWND handle)
 {
 	bool success = false;
 	LVCOLUMN lvc;
@@ -33,7 +33,7 @@ bool ListView::AddColumn(int index, int width, char* title, HWND handle)
 }
 
 
-void ListView::SetExSyles(char* styles, HWND handle)
+void ListView::SetExSyles(TCHAR* styles, HWND handle)
 {
 	DWORD exflags = WS_EX_LEFT;
 

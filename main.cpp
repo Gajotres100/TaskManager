@@ -5,11 +5,12 @@
 #include <psapi.h>
 #include <vector>
 
+
 HWND listBoxHWND;
 
-char FilePath[260];
-char s1[128];
-char s2[128];
+TCHAR FilePath[260];
+TCHAR s1[128];
+TCHAR s2[128];
 
 int CALLBACK CompareListItems(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
 
@@ -22,9 +23,9 @@ int NewTaskDialog::IDD(){
 }
 
 bool NewTaskDialog::OnOK(){
-	char Data[265];
+	TCHAR Data[265];
 	LoadString(0, IDS_EIMEPROC, s1, sizeof s1);
-	LoadString(0, IDS_EROR, s2, sizeof s2);	
+	LoadString(0, IDS_EROR, s2, sizeof s2);
 
 	GetDlgItemText(*this, IDC_TASKNAME, Data, 512);
 
@@ -61,11 +62,11 @@ bool NewTaskDialog::BrowseFile(HWND hwnd)
 	FilePath[0] = 0;
 	ofn.lStructSize = sizeof(ofn);
 	ofn.hwndOwner = hwnd;
-	ofn.lpstrFilter = s1;
+	ofn.lpstrFilter = LPSTR(s1);
 	ofn.lpstrFile = FilePath;
 	ofn.nMaxFile = 260;
 	ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-	ofn.lpstrDefExt = s2;
+	ofn.lpstrDefExt = LPSTR(s2);
 	GetOpenFileName(&ofn);
 }
 
@@ -96,7 +97,7 @@ bool ProcessInfoDialog::OnInitDialog()
 	do
 	{
 		ListView* lv = new ListView();
-		char  vrijednost[500];
+		TCHAR  vrijednost[500];
 		sprintf(vrijednost, "%s", me32.szExePath);
 		
 		SetDlgItemText(*this, IDS_COLL3, me32.szExePath);
@@ -189,7 +190,7 @@ int MainWindow::OnCreate(CREATESTRUCT* pcs)
 
 	ListView* lv = new ListView();
 	LoadString(0, IDS_EXTRASTYLE, s1, sizeof s1);
-	lv->SetExSyles(s1, ListProcesses);
+	lv->SetExSyles(LPSTR(s1), ListProcesses);
 	LoadString(0, IDS_COLL1, s1, sizeof s1);
 	lv->AddColumn(0, 190, s1, ListProcesses);
 	LoadString(0, IDS_COLL2, s1, sizeof s1);
@@ -261,7 +262,7 @@ bool MainWindow::GetProcesses()
 {
 	SendMessage(ListProcesses, LVM_DELETEALLITEMS, 0, 0);
 
-	char szText[64];
+	TCHAR szText[64];
 	LVITEM lvi;
 
 	HANDLE hProcessSnap;
@@ -310,7 +311,7 @@ bool MainWindow::GetProcesses()
 
 			LV_ITEM newItem;
 
-			char * value = pe32.szExeFile;
+			TCHAR * value = pe32.szExeFile;
 
 			for (int i = 0; i < strlen(value); ++i)
 				value[i] = tolower(value[i]);			
@@ -375,8 +376,8 @@ ListItem* MainWindow::ListProcessModules(DWORD dwPID, int subitemIndex, ListItem
 
 	do
 	{
-		char  lokacija[500];
-		char* value = me32.szExePath;
+		TCHAR  lokacija[500];
+		TCHAR* value = me32.szExePath;
 
 		for (int i = 0; i < strlen(value); ++i)
 			value[i] = tolower(value[i]);
@@ -401,7 +402,7 @@ bool MainWindow::PrintMemoryInfo(DWORD processID, int subitemIndex)
 
 	if (GetProcessMemoryInfo(hProcess, &pmc, sizeof(pmc)))
 	{
-		char workingSetSize[50];
+		TCHAR workingSetSize[50];
 		sprintf(workingSetSize, "%d", pmc.PagefileUsage);
 		ListView* lv = new ListView();
 		//lv->AddItem(subitemIndex, 3, workingSetSize, ListProcesses);
@@ -412,7 +413,7 @@ bool MainWindow::PrintMemoryInfo(DWORD processID, int subitemIndex)
 
 bool MainWindow::KillProcess(int index)
 {
-	char retText[500];
+	TCHAR retText[500];
 	LoadString(0, IDS_EROR, s2, sizeof s2);
 
 	int report;
@@ -611,7 +612,7 @@ bool MainWindow::OnColumnClick(LPNMLISTVIEW pLVInfo)
 
 bool MainWindow::OnRowRMClick(LPNMLISTVIEW pLVInfo)
 {
-	char retText[500];
+	TCHAR retText[500];
 	int row = ((LPNMLISTVIEW)pLVInfo)->iItem;
 	LVITEM lvi;
 

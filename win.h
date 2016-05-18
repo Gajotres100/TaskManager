@@ -66,17 +66,17 @@ protected:
 };
 
 struct ListItem {	
-	char szExeFile[MAX_PATH];
-	char procID[MAX_PATH];
-	char threadCount[MAX_PATH];
-	char location[MAX_PATH];
+	TCHAR szExeFile[MAX_PATH];
+	TCHAR procID[MAX_PATH];
+	TCHAR threadCount[MAX_PATH];
+	TCHAR location[MAX_PATH];
 };
 
 class ListView : public Window
 {
 public:	
-	virtual bool AddColumn(int index, int width, char* title, HWND handle);
-	virtual void SetExSyles(char* styles, HWND handle);
+	virtual bool AddColumn(int index, int width, TCHAR* title, HWND handle);
+	virtual void SetExSyles(TCHAR* styles, HWND handle);
 	std::string ClassName(){ return WC_LISTVIEW; }
 };
 

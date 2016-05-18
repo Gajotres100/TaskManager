@@ -1,5 +1,6 @@
 #include "win.h"
 #include "dlg.h"
+#include "tchar.h"
 
 
 
@@ -21,7 +22,7 @@ protected:
 class ProcessInfoDialog : public Dialog {
 public:
 	int index;
-	char* ProcessID;
+	TCHAR* ProcessID;
 protected:
 	int IDD();
 	bool OnInitDialog();
@@ -46,9 +47,9 @@ public:
 	ListItem* ListProcessModules(DWORD dwPID, int subitemIndex, ListItem* pItem);
 	bool PrintMemoryInfo(DWORD dwPID, int subitemIndex);
 	bool KillProcess(int index);
-	char Data[265];
-	HWND GetFirstWindowText(char buf[], unsigned int max_out, int *text_written);
-	int GetNextWindowText(char buf[], unsigned int max_out, HWND* handle);
+	TCHAR Data[265];
+	HWND GetFirstWindowText(TCHAR buf[], unsigned int max_out, int *text_written);
+	int GetNextWindowText(TCHAR buf[], unsigned int max_out, HWND* handle);
 	bool OnColumnClick(LPNMLISTVIEW pLVInfo);
 	bool OnRowRMClick(LPNMLISTVIEW pLVInfo);
 	bool OnDeletePress(LPNMLISTVIEW pLVInfo);
