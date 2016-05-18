@@ -5,13 +5,6 @@
 #include <psapi.h>
 #include <vector>
 
-
-HWND listBoxHWND;
-
-TCHAR FilePath[260];
-TCHAR s1[128];
-TCHAR s2[128];
-
 int CALLBACK CompareListItems(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
 
 int AboutDialog::IDD(){
@@ -24,6 +17,7 @@ int NewTaskDialog::IDD(){
 
 bool NewTaskDialog::OnOK(){
 	TCHAR Data[265];
+
 	LoadString(0, IDS_EIMEPROC, s1, sizeof s1);
 	LoadString(0, IDS_EROR, s2, sizeof s2);
 
@@ -45,15 +39,18 @@ bool NewTaskDialog::OnCommand(int id, int code)
 {
 	if (id == IDC_BROWSE)
 	{
-		BrowseFile(*this);
-		if (strcmp(FilePath, "")) SetDlgItemText(*this, IDC_TASKNAME, FilePath);
+		TCHAR filePath[260];
+		lstrcpyn(filePath, BrowseFile(*this), MAX_PATH);
+		if (strcmp(filePath, ""))
+			SetDlgItemText(*this, IDC_TASKNAME, filePath);
 	}
 
 	return 0;
 }
 
-bool NewTaskDialog::BrowseFile(HWND hwnd)
+TCHAR* NewTaskDialog::BrowseFile(HWND hwnd)
 {
+	TCHAR FilePath[260];
 	LoadString(0, IDS_EXFILTER, s1, sizeof s1);
 	LoadString(0, IDS_DEEXT, s2, sizeof s2);
 
@@ -68,6 +65,7 @@ bool NewTaskDialog::BrowseFile(HWND hwnd)
 	ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 	ofn.lpstrDefExt = LPSTR(s2);
 	GetOpenFileName(&ofn);
+	return FilePath;
 }
 
 int ProcessInfoDialog::IDD(){
@@ -96,7 +94,6 @@ bool ProcessInfoDialog::OnInitDialog()
 
 	do
 	{
-		ListView* lv = new ListView();
 		TCHAR  vrijednost[500];
 		sprintf(vrijednost, "%s", me32.szExePath);
 		
@@ -111,7 +108,7 @@ bool ProcessInfoDialog::OnInitDialog()
 
 		sprintf(vrijednost, "0x%04X", me32.GlblcntUsage);
 		SetDlgItemText(*this, IDS_COLL7, vrijednost);
-
+		
 	} 
 	while (Module32Next(hModuleSnap, &me32));
 
@@ -186,8 +183,6 @@ int MainWindow::OnCreate(CREATESTRUCT* pcs)
 	LoadString(0, IDS_REFRESH, s1, sizeof s1);
 	EndProcess.Create(*this, WS_CHILD | WS_VISIBLE | WS_BORDER, s1, ID_REFRESH, 130, 510, 120, 40);
 
-	listBoxHWND = ListProcesses;
-
 	ListView* lv = new ListView();
 	LoadString(0, IDS_EXTRASTYLE, s1, sizeof s1);
 	lv->SetExSyles(LPSTR(s1), ListProcesses);
@@ -199,6 +194,7 @@ int MainWindow::OnCreate(CREATESTRUCT* pcs)
 	lv->AddColumn(2, 120, s1, ListProcesses);
 	LoadString(0, IDS_COLL4, s1, sizeof s1);
 	lv->AddColumn(3, 350, s1, ListProcesses);
+	delete lv;
 	GetProcesses();
 	return 0;
 }
@@ -262,14 +258,12 @@ bool MainWindow::GetProcesses()
 {
 	SendMessage(ListProcesses, LVM_DELETEALLITEMS, 0, 0);
 
-	TCHAR szText[64];
 	LVITEM lvi;
 
 	HANDLE hProcessSnap;
 	HANDLE hProcess;
 	PROCESSENTRY32 pe32;
 	DWORD dwPriorityClass;
-
 
 	HMENU hMenu = GetMenu(*this);
 	MENUITEMINFO mii = { sizeof(MENUITEMINFO) };
@@ -298,17 +292,12 @@ bool MainWindow::GetProcesses()
 			continue;
 		}
 
-		hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pe32.th32ProcessID);
-		ListView* lv = new ListView();
-	
+		hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pe32.th32ProcessID);	
 
 		if (pe32.th32ProcessID > 0)
 		{
 			int insertIndex = ListView_GetItemCount(ListProcesses);
-			
-
 			ListItem* pItem = new ListItem();
-
 			LV_ITEM newItem;
 
 			TCHAR * value = pe32.szExeFile;
@@ -320,9 +309,8 @@ bool MainWindow::GetProcesses()
 			sprintf(pItem->procID, "%d", pe32.th32ProcessID);
 			sprintf(pItem->threadCount, "%d", pe32.cntThreads);
 
-			if (GetModuleFileNameEx(hProcess, NULL, FilePath, MAX_PATH) != 0)
+			if (GetModuleFileNameEx(hProcess, NULL, value, MAX_PATH) != 0)
 			{
-				value = FilePath;
 				for (int i = 0; i < strlen(value); ++i)
 					value[i] = tolower(value[i]);
 				sprintf(pItem->location, value);
@@ -353,6 +341,8 @@ bool MainWindow::GetProcesses()
 			newItem.cchTextMax = strlen(pItem->location);
 			newItem.iSubItem = 3;
 			SendMessage(ListProcesses, LVM_SETITEM, 0, (LPARAM)&newItem);
+
+			delete pItem;
 		}
 	} 
 	while (Process32Next(hProcessSnap, &pe32));
@@ -364,6 +354,7 @@ bool MainWindow::GetProcesses()
 
 bool MainWindow::KillProcess(int index)
 {
+
 	TCHAR retText[500];
 	LoadString(0, IDS_EROR, s2, sizeof s2);
 
@@ -378,7 +369,7 @@ bool MainWindow::KillProcess(int index)
 	lvi.cchTextMax = MAX_PATH;
 	lvi.iItem = index;
 
-	SendMessage(listBoxHWND, LVM_GETITEM, 0, (LPARAM)&lvi);
+	SendMessage(*this, LVM_GETITEM, 0, (LPARAM)&lvi);
 
 	HANDLE hModuleSnap = INVALID_HANDLE_VALUE;
 	hModuleSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, atoi(lvi.pszText));

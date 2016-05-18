@@ -6,11 +6,13 @@
 
 class NewTaskDialog : public Dialog {
 public:
+	TCHAR s1[128];
+	TCHAR s2[128];
 protected:
 	int IDD();
 	bool OnOK();
 	bool OnCommand(int id, int code);
-	bool BrowseFile(HWND);
+	TCHAR* BrowseFile(HWND);
 };
 
 class AboutDialog : public Dialog {
@@ -37,6 +39,8 @@ protected:
 
 class MainWindow : public Window {
 public:
+	TCHAR s1[128];
+	TCHAR s2[128];
 	MainWindow();
 	ListView ListProcesses;
 	ListBox ListBox;
