@@ -8,22 +8,22 @@
 
 IDM_MAIN MENU
 BEGIN
-    POPUP "&File"
+    POPUP "&Upravljaæ procesima"
     BEGIN
         MENUITEM "&Novi proces",               ID_NEWTASK
         MENUITEM SEPARATOR
-        MENUITEM "E&xit",                       ID_EXIT
+        MENUITEM "&Izlaz",                       ID_EXIT
     END
-    POPUP "&View"
+    POPUP "&Opcije"
     BEGIN
-        MENUITEM "&Refresh",                    ID_REFRESH
+        MENUITEM "&Osvježi",                    ID_REFRESH
 		MENUITEM "&Prikaži servise"				ID_EXPAND
     END
 	POPUP "&Pomoæ"
 	BEGIN
 		MENUITEM "&Prikaži pomoæ", IDD_HELP
 		MENUITEM SEPARATOR
-		MENUITEM "&About"				ID_ABOUT
+		MENUITEM "&O upravljaæu zadatcima"				ID_ABOUT
 	END
 END
 
@@ -38,10 +38,10 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Novi proces"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    LTEXT           "Open:",IDC_STATIC,7,19,16,13
+    LTEXT           "Otvori:",IDC_STATIC,7,19,16,13
 	EDITTEXT        IDC_TASKNAME, 30, 18, 182, 15, ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "OK",IDOK,52,50,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,108,50,50,14
+    DEFPUSHBUTTON   "Uredu",IDOK,52,50,50,14
+    PUSHBUTTON      "Odustani",IDCANCEL,108,50,50,14
 	PUSHBUTTON      "Browse", IDC_BROWSE, 163, 50, 50, 14
 END
 
@@ -62,8 +62,8 @@ BEGIN
 	LTEXT           "", IDS_COLL6, 61, 85, 138, 105
 	LTEXT           "Ref count (g):", IDC_STATIC, 3, 105, 60, 125
 	LTEXT           "", IDS_COLL7, 61, 105, 138, 125
-	DEFPUSHBUTTON   "End Task", IDC_ENDPROCES, 5, 125, 70, 15
-	PUSHBUTTON      "Cancel", IDCANCEL, 85, 125, 70, 15
+	DEFPUSHBUTTON   "Prekini proces", IDC_ENDPROCES, 5, 125, 70, 15
+	PUSHBUTTON      "Odustani", IDCANCEL, 85, 125, 70, 15
 END
 
 IDD_HELP DIALOGEX 100, 100, 156, 124
@@ -71,7 +71,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Pomoæ"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-LTEXT           "F1: pokreæe pomoæ\n\nEnd task: prekida rad procesa\n\nDel: prekid rada proce\n\nDesna tipka miša: Više informacija o procesu\n\nNovi proces: pokreæe novi proces\n\nRefresh: osvježava popis procesa", IDC_STATIC, 2, 2, 154, 104
+LTEXT           "F1: pokreæe pomoæ\n\nPrekini proces: prekida rad procesa\n\nDel: prekid rada proce\n\nDesna tipka miša: Više informacija o procesu\n\nNovi proces: pokreæe novi proces\n\nOsvježi: osvježava popis procesa", IDC_STATIC, 2, 2, 154, 104
 DEFPUSHBUTTON   "OK", IDOK, 104, 107, 50, 14
 END
 
@@ -92,8 +92,8 @@ BEGIN
 	IDS_EIMEPROC "Nije uneseno ime procesa !"
 	IDS_EXFILTER "Exe Files\0*.exe\0"
 	IDS_DEEXT "all"
-	IDS_ENDTASK "End Task"
-	IDS_REFRESH "Refresh"
+	IDS_ENDTASK "Prekini proces"
+	IDS_REFRESH "Osvježi"
 	IDS_EXTRASTYLE "fullrow header overflow"
 	IDS_COLL1 "Ime"
 	IDS_COLL2 "ProcesID"

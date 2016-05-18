@@ -320,7 +320,13 @@ bool MainWindow::GetProcesses()
 			sprintf(pItem->procID, "%d", pe32.th32ProcessID);
 			sprintf(pItem->threadCount, "%d", pe32.cntThreads);
 
-			pItem = ListProcessModules(pe32.th32ProcessID, insertIndex, pItem);			
+			if (GetModuleFileNameEx(hProcess, NULL, FilePath, MAX_PATH) != 0)
+			{
+				value = FilePath;
+				for (int i = 0; i < strlen(value); ++i)
+					value[i] = tolower(value[i]);
+				sprintf(pItem->location, value);
+			}		
 			
 			newItem.mask = LVIF_TEXT | LVIF_PARAM;
 			newItem.iItem = insertIndex;
@@ -354,61 +360,6 @@ bool MainWindow::GetProcesses()
 	CloseHandle(hProcessSnap);
 
 	return(true);
-}
-
-ListItem* MainWindow::ListProcessModules(DWORD dwPID, int subitemIndex, ListItem* pItem)
-{
-	HANDLE hModuleSnap = INVALID_HANDLE_VALUE;
-	MODULEENTRY32 me32;
-
-	hModuleSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, dwPID);
-	if (hModuleSnap == INVALID_HANDLE_VALUE)
-	{
-		return pItem;
-	}
-
-	me32.dwSize = sizeof(MODULEENTRY32);
-	if (!Module32First(hModuleSnap, &me32))
-	{
-		CloseHandle(hModuleSnap);
-		return pItem;
-	}
-
-	do
-	{
-		TCHAR  lokacija[500];
-		TCHAR* value = me32.szExePath;
-
-		for (int i = 0; i < strlen(value); ++i)
-			value[i] = tolower(value[i]);
-
-		sprintf(pItem->location, value);
-	} while (Module32Next(hModuleSnap, &me32));
-
-	CloseHandle(hModuleSnap);
-	return pItem;
-}
-
-bool MainWindow::PrintMemoryInfo(DWORD processID, int subitemIndex)
-{
-	HANDLE hProcess;
-	PROCESS_MEMORY_COUNTERS pmc;
-
-	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION |
-		PROCESS_VM_READ,
-		FALSE, processID);
-	if (NULL == hProcess)
-		return false;
-
-	if (GetProcessMemoryInfo(hProcess, &pmc, sizeof(pmc)))
-	{
-		TCHAR workingSetSize[50];
-		sprintf(workingSetSize, "%d", pmc.PagefileUsage);
-		ListView* lv = new ListView();
-		//lv->AddItem(subitemIndex, 3, workingSetSize, ListProcesses);
-	}
-
-	CloseHandle(hProcess);
 }
 
 bool MainWindow::KillProcess(int index)
