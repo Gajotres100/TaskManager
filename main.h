@@ -48,7 +48,7 @@ protected:
 	int IDD();
 	bool OnOK();
 	bool OnCommand(int id, int code);
-	TCHAR* BrowseFile(HWND);
+	std::string BrowseFile(HWND);
 };
 
 class AboutDialog : public Dialog {

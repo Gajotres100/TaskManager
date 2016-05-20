@@ -27,7 +27,7 @@ bool ListView::AddColumn(int index, int width, TCHAR* title, HWND handle)
 	lvc.iSubItem = index;
 	lvc.pszText = title;
 	lvc.cchTextMax = strlen(title);
-	success = ListView_InsertColumn(handle, index, &lvc);
+	success = ListView_InsertColumn(handle, index, &lvc) == 1 ? true:false;
 	
 	return(success);
 }
@@ -77,7 +77,7 @@ tstring Window::GenerateClassName()
 {
 	static int cnt=1;
 	TCHAR s[16];
-	_stprintf(s, _T("TM%d"), cnt++);
+	_stprintf_s(s, _T("TM%d"), cnt++);
 	return tstring(s);
 }
 

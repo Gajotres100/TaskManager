@@ -39,16 +39,16 @@ bool NewTaskDialog::OnCommand(int id, int code)
 {
 	if (id == IDC_BROWSE)
 	{
-		TCHAR filePath[260];
-		lstrcpyn(filePath, BrowseFile(*this), MAX_PATH);
-		if (strcmp(filePath, ""))
-			SetDlgItemText(*this, IDC_TASKNAME, filePath);
+		std::string filePath = BrowseFile(*this);
+
+		if (filePath.compare(""))
+			SetDlgItemText(*this, IDC_TASKNAME, filePath.c_str());
 	}
 
 	return 0;
 }
 
-TCHAR* NewTaskDialog::BrowseFile(HWND hwnd)
+std::string NewTaskDialog::BrowseFile(HWND hwnd)
 {
 	TCHAR FilePath[260];
 	LoadString(0, IDS_EXFILTER, s1, sizeof s1);
@@ -95,18 +95,19 @@ bool ProcessInfoDialog::OnInitDialog()
 	do
 	{
 		TCHAR  vrijednost[500];
-		sprintf(vrijednost, "%s", me32.szExePath);
+
+		sprintf_s(vrijednost, "%s", me32.szExePath);
 		
 		SetDlgItemText(*this, IDS_COLL3, me32.szExePath);
 		SetDlgItemText(*this, IDS_COLL4, me32.szModule);
 
-		sprintf(vrijednost, "0x%08X", me32.modBaseAddr);
+		sprintf_s(vrijednost, "0x%08X", me32.modBaseAddr);
 		SetDlgItemText(*this, IDS_COLL5, vrijednost);
 
-		sprintf(vrijednost, "0x%04X", me32.ProccntUsage);
+		sprintf_s(vrijednost, "0x%04X", me32.ProccntUsage);
 		SetDlgItemText(*this, IDS_COLL6, vrijednost);
 
-		sprintf(vrijednost, "0x%04X", me32.GlblcntUsage);
+		sprintf_s(vrijednost, "0x%04X", me32.GlblcntUsage);
 		SetDlgItemText(*this, IDS_COLL7, vrijednost);
 		
 	} 
@@ -259,12 +260,9 @@ bool MainWindow::GetProcesses()
 {
 	SendMessage(ListProcesses, LVM_DELETEALLITEMS, 0, 0);
 
-	LVITEM lvi;
-
 	HANDLE hProcessSnap;
 	HANDLE hProcess;
 	PROCESSENTRY32 pe32;
-	DWORD dwPriorityClass;
 
 	HMENU hMenu = GetMenu(*this);
 	MENUITEMINFO mii = { sizeof(MENUITEMINFO) };
@@ -302,22 +300,23 @@ bool MainWindow::GetProcesses()
 			pItem = new ListItem();
 			LV_ITEM newItem;
 
-			TCHAR * value = pe32.szExeFile;
+			std::string value = pe32.szExeFile;		
 
-			for (int i = 0; i < strlen(value); ++i)
-				value[i] = tolower(value[i]);			
+			sprintf_s(pItem->szExeFile, value.c_str());
+			sprintf_s(pItem->procID, "%d", pe32.th32ProcessID);
+			sprintf_s(pItem->threadCount, "%d", pe32.cntThreads);
 
-			sprintf(pItem->szExeFile, value);
-			sprintf(pItem->procID, "%d", pe32.th32ProcessID);
-			sprintf(pItem->threadCount, "%d", pe32.cntThreads);
 
-			if (GetModuleFileNameEx(hProcess, NULL, value, MAX_PATH) != 0)
-			{
-				for (int i = 0; i < strlen(value); ++i)
-					value[i] = tolower(value[i]);
-				sprintf(pItem->location, value);
-			}		
-			
+			TCHAR szBuffer[MAX_PATH];
+			DWORD dwSize = sizeof(szBuffer) / sizeof(szBuffer[0]) - 1;
+			QueryFullProcessImageName(hProcess, 0, szBuffer, &dwSize);
+			sprintf_s(pItem->location, szBuffer);
+
+			if (szBuffer != "")
+				sprintf_s(pItem->location, szBuffer);
+			else
+				sprintf_s(pItem->location, "Default");
+
 			newItem.mask = LVIF_TEXT | LVIF_PARAM;
 			newItem.iItem = insertIndex;
 			newItem.pszText = pItem->szExeFile;
@@ -358,7 +357,6 @@ bool MainWindow::KillProcess(int index)
 	TCHAR retText[500];
 	LoadString(0, IDS_EROR, s2, sizeof s2);
 
-	int report;
 	LVITEM lvi;
 
 	lvi.mask = LVIF_TEXT | LVIF_STATE;
@@ -378,6 +376,7 @@ bool MainWindow::KillProcess(int index)
 	if (hModuleSnap == INVALID_HANDLE_VALUE)
 	{
 		SC_HANDLE SCManager = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
+
 		if (SCManager == NULL)
 		{
 			LoadString(0, IDS_NORIGHTS, s1, sizeof s1);
@@ -529,6 +528,7 @@ int CALLBACK CompareListItems(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
 		else
 			return strcmp(item2->szExeFile, item1->szExeFile);
 	}
+	return 0;
 }
 
 bool MainWindow::OnColumnClick(LPNMLISTVIEW pLVInfo)
