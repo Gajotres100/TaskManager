@@ -75,6 +75,7 @@ protected:
 
 class MainWindow : public Window {
 public:
+	ListItem* pItem;
 	TCHAR s1[128];
 	TCHAR s2[128];
 	MainWindow();

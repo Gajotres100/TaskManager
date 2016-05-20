@@ -240,6 +240,7 @@ void MainWindow::OnCommand(int id){
 			if (about.DoModal(NULL, *this) == IDOK){}
 			break;
 		case ID_EXIT: 
+			delete[] pItem;
 			DestroyWindow(*this);
 			break;
 	}
@@ -283,6 +284,7 @@ bool MainWindow::GetProcesses()
 		CloseHandle(hProcessSnap);
 		return(FALSE);
 	}
+
 	do
 	{
 		HANDLE hModuleSnap = INVALID_HANDLE_VALUE;
@@ -297,7 +299,7 @@ bool MainWindow::GetProcesses()
 		if (pe32.th32ProcessID > 0)
 		{
 			int insertIndex = ListView_GetItemCount(ListProcesses);
-			ListItem* pItem = new ListItem();
+			pItem = new ListItem();
 			LV_ITEM newItem;
 
 			TCHAR * value = pe32.szExeFile;
@@ -340,14 +342,12 @@ bool MainWindow::GetProcesses()
 			newItem.pszText = pItem->location;
 			newItem.cchTextMax = strlen(pItem->location);
 			newItem.iSubItem = 3;
-			SendMessage(ListProcesses, LVM_SETITEM, 0, (LPARAM)&newItem);
-
-			delete pItem;
+			SendMessage(ListProcesses, LVM_SETITEM, 0, (LPARAM)&newItem);			
 		}
 	} 
 	while (Process32Next(hProcessSnap, &pe32));
 
-	CloseHandle(hProcessSnap);
+	CloseHandle(hProcessSnap);	
 
 	return(true);
 }
