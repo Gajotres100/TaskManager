@@ -30,6 +30,14 @@ enum class ColumnWidth {
 	Loc = 350
 };
 
+enum class MainWinSize {
+	X = 0,
+	Y = 0,
+	Width = 520,
+	Height = 630
+};
+
+
 
 
 class NewTaskDialog : public Dialog {
