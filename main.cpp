@@ -292,54 +292,58 @@ bool MainWindow::GetProcesses()
 			continue;
 		}
 
+		pItem = new ListItem();
+
 		hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pe32.th32ProcessID);	
 
 		if (pe32.th32ProcessID > 0)
 		{
 			int insertIndex = ListView_GetItemCount(ListProcesses);
-			pItem = new ListItem();
+		
 			LV_ITEM newItem;
 
-			std::string value = pe32.szExeFile;		
+			std::string value = pe32.szExeFile;	
+			for (int i = 0; value[i]; i++) value[i] = tolower(value[i]);
 
-			sprintf_s(pItem->szExeFile, value.c_str());
-			sprintf_s(pItem->procID, "%d", pe32.th32ProcessID);
-			sprintf_s(pItem->threadCount, "%d", pe32.cntThreads);
-
+			pItem->szExeFile  = value.c_str();
+			pItem->procID = std::to_string(pe32.th32ProcessID);
+			pItem->threadCount = std::to_string(pe32.cntThreads);
 
 			TCHAR szBuffer[MAX_PATH];
 			DWORD dwSize = sizeof(szBuffer) / sizeof(szBuffer[0]) - 1;
-			QueryFullProcessImageName(hProcess, 0, szBuffer, &dwSize);
-			sprintf_s(pItem->location, szBuffer);
-
-			if (szBuffer != "")
-				sprintf_s(pItem->location, szBuffer);
-			else
-				sprintf_s(pItem->location, "Default");
+			bool iResult = QueryFullProcessImageName(hProcess, 0, szBuffer, &dwSize);
+			if (!iResult)
+			{
+				LoadString(0, IDS_DEFAULTPROCLOC, s1, sizeof s1);
+				value = s1;
+			}
+			else value = szBuffer;
+			for (int i = 0; value[i]; i++) value[i] = tolower(value[i]);			
+			pItem->location = value;		
 
 			newItem.mask = LVIF_TEXT | LVIF_PARAM;
 			newItem.iItem = insertIndex;
-			newItem.pszText = pItem->szExeFile;
-			newItem.cchTextMax = strlen(pItem->szExeFile);
+			newItem.pszText = _strdup(pItem->szExeFile.c_str());
+			newItem.cchTextMax = strlen(pItem->szExeFile.c_str());
 			newItem.iSubItem = 0;
 			newItem.lParam = (LPARAM)pItem;
 			insertIndex = SendMessage(ListProcesses, LVM_INSERTITEM, 0, (LPARAM)&newItem);
 
 			newItem.mask = LVIF_TEXT;
-			newItem.pszText = pItem->procID;
-			newItem.cchTextMax = strlen(pItem->procID);
+			newItem.pszText = _strdup(pItem->procID.c_str());
+			newItem.cchTextMax = strlen(pItem->procID.c_str());
 			newItem.iSubItem = 1;
 			SendMessage(ListProcesses, LVM_SETITEM, 0, (LPARAM)&newItem);
 
 			newItem.mask = LVIF_TEXT;
-			newItem.pszText = pItem->threadCount;
-			newItem.cchTextMax = strlen(pItem->threadCount);
+			newItem.pszText = _strdup(pItem->threadCount.c_str());
+			newItem.cchTextMax = strlen(pItem->threadCount.c_str());
 			newItem.iSubItem = 2;
 			SendMessage(ListProcesses, LVM_SETITEM, 0, (LPARAM)&newItem);
 
 			newItem.mask = LVIF_TEXT;
-			newItem.pszText = pItem->location;
-			newItem.cchTextMax = strlen(pItem->location);
+			newItem.pszText = _strdup(pItem->location.c_str());
+			newItem.cchTextMax = strlen(pItem->location.c_str());
 			newItem.iSubItem = 3;
 			SendMessage(ListProcesses, LVM_SETITEM, 0, (LPARAM)&newItem);			
 		}
@@ -490,43 +494,42 @@ int CALLBACK CompareListItems(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
 	if (nColumn == 0)
 	{
 		if (isAsc)
-			return strcmp(item2->szExeFile, item1->szExeFile);			
+			return strcmp(item2->szExeFile.c_str(), item1->szExeFile.c_str());
 		else
-			return strcmp(item1->szExeFile, item2->szExeFile);
+			return strcmp(item1->szExeFile.c_str(), item2->szExeFile.c_str());
 	}
 	else if (nColumn == 1)
-	{
-		
+	{		
 		if (isAsc)
 		{
-			if (atoi(item1->procID) < atoi(item2->procID)) { return -1; }
-			if (atoi(item1->procID) > atoi(item2->procID)) { return  1; }
+			if (atoi(item1->procID.c_str()) < atoi(item2->procID.c_str())) { return -1; }
+			if (atoi(item1->procID.c_str()) > atoi(item2->procID.c_str())) { return  1; }
 		}
 		else
 		{
-			if (atoi(item2->procID) < atoi(item1->procID)) { return -1; }
-			if (atoi(item2->procID) > atoi(item1->procID)) { return  1; }
+			if (atoi(item2->procID.c_str()) < atoi(item1->procID.c_str())) { return -1; }
+			if (atoi(item2->procID.c_str()) > atoi(item1->procID.c_str())) { return  1; }
 		}
 	}
 	else if (nColumn == 2)
 	{
 		if (isAsc)
 		{
-			if (atoi(item1->threadCount) < atoi(item2->threadCount)) { return -1; }
-			if (atoi(item1->threadCount) > atoi(item2->threadCount)) { return  1; }
+			if (atoi(item1->threadCount.c_str()) < atoi(item2->threadCount.c_str())) { return -1; }
+			if (atoi(item1->threadCount.c_str()) > atoi(item2->threadCount.c_str())) { return  1; }
 		}
 		else
 		{
-			if (atoi(item2->threadCount) < atoi(item1->threadCount)) { return -1; }
-			if (atoi(item2->threadCount) > atoi(item1->threadCount)) { return  1; }
+			if (atoi(item2->threadCount.c_str()) < atoi(item1->threadCount.c_str())) { return -1; }
+			if (atoi(item2->threadCount.c_str()) > atoi(item1->threadCount.c_str())) { return  1; }
 		}
 	}
 	else if (nColumn == 3)
 	{
 		if (isAsc)
-			return strcmp(item1->szExeFile, item2->szExeFile);
+			return strcmp(item1->szExeFile.c_str(), item2->szExeFile.c_str());
 		else
-			return strcmp(item2->szExeFile, item1->szExeFile);
+			return strcmp(item2->szExeFile.c_str(), item1->szExeFile.c_str());
 	}
 	return 0;
 }

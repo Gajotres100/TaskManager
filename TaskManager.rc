@@ -103,6 +103,7 @@ BEGIN
 	IDS_ERKILLRSERV "Greška prilikom gašenja servisa"
 	IDS_UNABLEKILLRSERV "Servis nije moguæe ugasiti"
 	IDS_NORIGHTS "Pokrenite aplikacijui kao administrator"
+	IDS_DEFAULTPROCLOC "c:\\windows\\system32\\"
 END
 
 IDI_ICON1               ICON                    "icon1.ico"

@@ -66,10 +66,10 @@ protected:
 };
 
 struct ListItem {	
-	TCHAR szExeFile[MAX_PATH];
-	TCHAR procID[MAX_PATH];
-	TCHAR threadCount[MAX_PATH];
-	TCHAR location[MAX_PATH];
+	std::string szExeFile;
+	std::string procID;
+	std::string threadCount;
+	std::string location;
 };
 
 class ListView : public Window
