@@ -177,23 +177,23 @@ void MainWindow::OnKeyDown(int code)
 
 int MainWindow::OnCreate(CREATESTRUCT* pcs)
 {
-	ListProcesses.Create(*this, WS_CHILD | WS_VISIBLE | LVS_REPORT | LVS_EDITLABELS | WS_BORDER, "", IDC_LV, 0, 0, 500, 500);
+	ListProcesses.Create(*this, WS_CHILD | WS_VISIBLE | LVS_REPORT | LVS_EDITLABELS | WS_BORDER, "", IDC_LV, (int)LVProcSize::X, (int)LVProcSize::Y, (int)LVProcSize::Width, (int)LVProcSize::Height);
 	LoadString(0, IDS_ENDTASK, s1, sizeof s1);
-	EndProcess.Create(*this, WS_CHILD | WS_VISIBLE | WS_BORDER, s1, IDC_ENDPROCES, 0, 510, 120, 40);
+	EndProcess.Create(*this, WS_CHILD | WS_VISIBLE | WS_BORDER, s1, IDC_ENDPROCES, (int)BtnEndProc::X, (int)BtnEndProc::Y, (int)BtnEndProc::Width, (int)BtnEndProc::Height);
 	LoadString(0, IDS_REFRESH, s1, sizeof s1);
-	EndProcess.Create(*this, WS_CHILD | WS_VISIBLE | WS_BORDER, s1, ID_REFRESH, 130, 510, 120, 40);
+	EndProcess.Create(*this, WS_CHILD | WS_VISIBLE | WS_BORDER, s1, ID_REFRESH, (int)BtnRefresh::X, (int)BtnRefresh::Y, (int)BtnRefresh::Width, (int)BtnRefresh::Height);
 
 	ListView* lv = new ListView();
 	LoadString(0, IDS_EXTRASTYLE, s1, sizeof s1);
 	lv->SetExSyles(LPSTR(s1), ListProcesses);
 	LoadString(0, IDS_COLL1, s1, sizeof s1);
-	lv->AddColumn(0, 190, s1, ListProcesses);
+	lv->AddColumn(0, (int)ColumnWidth::Name, s1, ListProcesses);
 	LoadString(0, IDS_COLL2, s1, sizeof s1);
-	lv->AddColumn(1, 100, s1, ListProcesses);
+	lv->AddColumn(1, (int)ColumnWidth::ProcID, s1, ListProcesses);
 	LoadString(0, IDS_COLL3, s1, sizeof s1);
-	lv->AddColumn(2, 120, s1, ListProcesses);
+	lv->AddColumn(2, (int)ColumnWidth::ThreadNo, s1, ListProcesses);
 	LoadString(0, IDS_COLL4, s1, sizeof s1);
-	lv->AddColumn(3, 350, s1, ListProcesses);
+	lv->AddColumn(3, (int)ColumnWidth::Loc, s1, ListProcesses);
 	delete lv;
 	GetProcesses();
 	return 0;
@@ -369,7 +369,9 @@ bool MainWindow::KillProcess(int index)
 	lvi.cchTextMax = MAX_PATH;
 	lvi.iItem = index;
 
-	SendMessage(*this, LVM_GETITEM, 0, (LPARAM)&lvi);
+	HWND hwndList = GetDlgItem(*this, IDC_LV);
+
+	SendMessage(hwndList, LVM_GETITEM, 0, (LPARAM)&lvi);
 
 	HANDLE hModuleSnap = INVALID_HANDLE_VALUE;
 	hModuleSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, atoi(lvi.pszText));

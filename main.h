@@ -2,6 +2,34 @@
 #include "dlg.h"
 #include "tchar.h"
 
+enum class LVProcSize { 
+	X = 0, 
+	Y = 0, 
+	Width = 500, 
+	Height = 500 
+};
+
+enum class BtnEndProc {
+	X = 0,
+	Y = 510,
+	Width = 130,
+	Height = 40
+};
+
+enum class BtnRefresh {
+	X = 140,
+	Y = 510,
+	Width = 130,
+	Height = 40
+};
+
+enum class ColumnWidth {
+	Name = 190,
+	ProcID = 100,
+	ThreadNo = 120,
+	Loc = 350
+};
+
 
 
 class NewTaskDialog : public Dialog {
