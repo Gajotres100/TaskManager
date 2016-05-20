@@ -178,7 +178,7 @@ void MainWindow::OnKeyDown(int code)
 
 int MainWindow::OnCreate(CREATESTRUCT* pcs)
 {
-	ListProcesses.Create(*this, WS_CHILD | WS_VISIBLE | LVS_REPORT | LVS_EDITLABELS | WS_BORDER, "", IDC_LV, (int)LVProcSize::X, (int)LVProcSize::Y, (int)LVProcSize::Width, (int)LVProcSize::Height);
+	ListProcesses.Create(*this, WS_CHILD | WS_VISIBLE | LVS_REPORT | LVS_EDITLABELS | WS_BORDER | LVS_SHOWSELALWAYS, "", IDC_LV, (int)LVProcSize::X, (int)LVProcSize::Y, (int)LVProcSize::Width, (int)LVProcSize::Height);
 	LoadString(0, IDS_ENDTASK, s1, sizeof s1);
 	EndProcess.Create(*this, WS_CHILD | WS_VISIBLE | WS_BORDER, s1, IDC_ENDPROCES, (int)BtnEndProc::X, (int)BtnEndProc::Y, (int)BtnEndProc::Width, (int)BtnEndProc::Height);
 	LoadString(0, IDS_REFRESH, s1, sizeof s1);
