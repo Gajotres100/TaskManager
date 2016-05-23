@@ -318,6 +318,7 @@ bool MainWindow::GetProcesses()
 				value = s1;
 			}
 			else value = szBuffer;
+
 			for (int i = 0; value[i]; i++) value[i] = tolower(value[i]);			
 			pItem->location = value;		
 
