@@ -45,25 +45,17 @@ BEGIN
 	PUSHBUTTON      "Pronaði proces", IDC_BROWSE, 163, 50, 50, 14
 END
 
-IDD_PROCESSINFO DIALOGEX 0, 0, 200, 145
+IDD_PROCESSINFO DIALOGEX 0, 0, 264, 74
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Informacije o procesu"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-	LTEXT           "Identifikator procesa:", IDC_STATIC, 5, 5, 60, 25
+	LTEXT           "Identifikator procesa:", IDC_STATIC, 5, 5, 277, 18
 	LTEXT           "", IDS_COLL2, 61, 5, 138, 25
-	LTEXT           "Lokacija:", IDC_STATIC, 5, 25, 60, 45
-	LTEXT           "", IDS_COLL3, 61, 25, 138, 45
-	LTEXT           "Modul:", IDC_STATIC, 4, 45, 60, 65
-	LTEXT           "", IDS_COLL4, 61, 45, 138, 65
-	LTEXT           "Bazna adresa:", IDC_STATIC, 4, 65, 60, 85
-	LTEXT           "", IDS_COLL5, 61, 65, 138, 85
-	LTEXT           "Broj modula (p):", IDC_STATIC, 3, 85, 60, 105
-	LTEXT           "", IDS_COLL6, 61, 85, 138, 105
-	LTEXT           "Broj modula (g):", IDC_STATIC, 3, 105, 60, 125
-	LTEXT           "", IDS_COLL7, 61, 105, 138, 125
-	DEFPUSHBUTTON   "Prekini proces", IDC_ENDPROCES, 5, 125, 70, 15
-	PUSHBUTTON      "Odustani", IDCANCEL, 85, 125, 70, 15
+	LTEXT           "Lokacija:", IDC_STATIC, 5, 25, 285, 23
+	LTEXT           "", IDS_COLL3, 57, 23, 168, 45
+	DEFPUSHBUTTON   "Prekini proces", IDC_ENDPROCES, 2, 51, 70, 15
+	PUSHBUTTON      "Odustani", IDCANCEL, 84, 52, 70, 15
 END
 
 IDD_HELP DIALOGEX 100, 100, 156, 124

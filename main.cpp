@@ -75,45 +75,22 @@ int ProcessInfoDialog::IDD(){
 bool ProcessInfoDialog::OnInitDialog()
 {
 	SetDlgItemText(*this, IDS_COLL2, ProcessID);
-
-	HANDLE hModuleSnap = INVALID_HANDLE_VALUE;
-	MODULEENTRY32 me32;
-
-	hModuleSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, atoi(ProcessID));
-	if (hModuleSnap == INVALID_HANDLE_VALUE)
+    HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, atoi(ProcessID));
+	std::string  value;
+	TCHAR szBuffer[MAX_PATH];
+	TCHAR s1[128];
+	DWORD dwSize = sizeof(szBuffer) / sizeof(szBuffer[0]) - 1;
+	bool iResult = QueryFullProcessImageName(hProcess, 0, szBuffer, &dwSize);
+	if (!iResult)
 	{
-		return(false);
+		LoadString(0, IDS_DEFAULTPROCLOC, s1, sizeof s1);
+		value = s1;
 	}
+	else value = szBuffer;
 
-	me32.dwSize = sizeof(MODULEENTRY32);
-	if (!Module32First(hModuleSnap, &me32))
-	{
-		CloseHandle(hModuleSnap);
-		return(false);
-	}
-
-	do
-	{
-		TCHAR  vrijednost[500];
-
-		sprintf_s(vrijednost, "%s", me32.szExePath);
-		
-		SetDlgItemText(*this, IDS_COLL3, me32.szExePath);
-		SetDlgItemText(*this, IDS_COLL4, me32.szModule);
-
-		sprintf_s(vrijednost, "0x%08X", me32.modBaseAddr);
-		SetDlgItemText(*this, IDS_COLL5, vrijednost);
-
-		sprintf_s(vrijednost, "0x%04X", me32.ProccntUsage);
-		SetDlgItemText(*this, IDS_COLL6, vrijednost);
-
-		sprintf_s(vrijednost, "0x%04X", me32.GlblcntUsage);
-		SetDlgItemText(*this, IDS_COLL7, vrijednost);
-		
-	} 
-	while (Module32Next(hModuleSnap, &me32));
-
-	CloseHandle(hModuleSnap);
+	for (int i = 0; value[i]; i++) value[i] = tolower(value[i]);		
+	SetDlgItemText(*this, IDS_COLL3, value.c_str());	
+	CloseHandle(hProcess);
 	return true;
 }
 
