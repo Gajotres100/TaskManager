@@ -45,17 +45,17 @@ BEGIN
 	PUSHBUTTON      "Pronaði proces", IDC_BROWSE, 163, 50, 50, 14
 END
 
-IDD_PROCESSINFO DIALOGEX 0, 0, 264, 74
+IDD_PROCESSINFO DIALOGEX 0, 0, 268, 95
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Informacije o procesu"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-	LTEXT           "Identifikator procesa:", IDC_STATIC, 5, 5, 277, 18
-	LTEXT           "", IDS_COLL2, 61, 5, 138, 25
-	LTEXT           "Lokacija:", IDC_STATIC, 5, 25, 285, 23
-	LTEXT           "", IDS_COLL3, 57, 23, 168, 45
-	DEFPUSHBUTTON   "Prekini proces", IDC_ENDPROCES, 2, 51, 70, 15
-	PUSHBUTTON      "Odustani", IDCANCEL, 84, 52, 70, 15
+LTEXT           "Identifikator procesa:", IDC_STATIC, 5, 5, 60, 20
+LTEXT           "", IDS_COLL2, 57, 5, 138, 25
+LTEXT           "Lokacija:", IDC_STATIC, 5, 25, 60, 20
+LTEXT           "", IDS_COLL3, 57, 26, 195, 175
+DEFPUSHBUTTON   "Prekini proces", IDC_ENDPROCES, 3, 73, 70, 15
+PUSHBUTTON      "Odustani", IDCANCEL, 84, 73, 70, 15
 END
 
 IDD_HELP DIALOGEX 100, 100, 156, 124
