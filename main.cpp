@@ -3,6 +3,7 @@
 #include <tlhelp32.h>
 #include <commctrl.h>
 #include <psapi.h>
+#include <iostream>
 #include <vector>
 
 int CALLBACK CompareListItems(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
@@ -235,7 +236,14 @@ MainWindow::MainWindow(){
 
 bool MainWindow::GetProcesses()
 {
-	SendMessage(ListProcesses, LVM_DELETEALLITEMS, 0, 0);
+	ListView_DeleteAllItems(ListProcesses);
+	std::vector<ListItem*>::iterator liter;
+
+	for (liter = Lvect.begin(); liter<Lvect.end();)
+	{
+		delete (*liter);
+		liter = Lvect.erase(liter);
+	}
 
 	HANDLE hProcessSnap;
 	HANDLE hProcess;
@@ -276,8 +284,6 @@ bool MainWindow::GetProcesses()
 		if (pe32.th32ProcessID > 0)
 		{
 			int insertIndex = ListView_GetItemCount(ListProcesses);
-		
-			LV_ITEM newItem;
 
 			std::string value = pe32.szExeFile;	
 			for (int i = 0; value[i]; i++) value[i] = tolower(value[i]);
@@ -298,19 +304,21 @@ bool MainWindow::GetProcesses()
 
 			for (int i = 0; value[i]; i++) value[i] = tolower(value[i]);			
 			pItem->location = value;		
-
-			LV_ITEM newItem2;
+		
+			LV_ITEM newItem;
 			newItem.mask = LVIF_TEXT | LVIF_PARAM;
 			newItem.iItem = insertIndex;
 			newItem.pszText = _strdup(pItem->szExeFile.c_str());
 			newItem.cchTextMax = strlen(pItem->szExeFile.c_str());
 			newItem.iSubItem = 0;
-			newItem.lParam = (LPARAM)pItem;
+			newItem.lParam = (LPARAM)pItem;		
 			
 			insertIndex = ListView_InsertItem(ListProcesses, &newItem);
 			ListView_SetItemText(ListProcesses, insertIndex, 1, _strdup(pItem->procID.c_str()));
 			ListView_SetItemText(ListProcesses, insertIndex, 2, _strdup(pItem->threadCount.c_str())); 
-			ListView_SetItemText(ListProcesses, insertIndex, 3, _strdup(pItem->location.c_str()));
+			ListView_SetItemText(ListProcesses, insertIndex, 3, _strdup(pItem->location.c_str()));	
+
+			Lvect.push_back(pItem);
 		}
 	} 
 	while (Process32Next(hProcessSnap, &pe32));

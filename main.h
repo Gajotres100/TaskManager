@@ -1,6 +1,8 @@
 #include "win.h"
 #include "dlg.h"
 #include "tchar.h"
+#include <iostream>
+#include <vector>
 
 enum class LVProcSize { 
 	X = 0, 
@@ -83,6 +85,7 @@ public:
 	ListBox ListBox;
 	Button EndProcess;
 	Button RefreshProceses;
+	std::vector<ListItem*> Lvect;
 	bool GetTasks();
 	bool GetProcesses();
 	ListItem* ListProcessModules(DWORD dwPID, int subitemIndex, ListItem* pItem);

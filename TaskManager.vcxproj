@@ -143,6 +143,7 @@
   <ItemGroup>
     <ClInclude Include="main.h" />
     <ClInclude Include="dlg.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="win.h" />
     <ClInclude Include="rc.h" />
   </ItemGroup>
