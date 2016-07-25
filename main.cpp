@@ -161,18 +161,18 @@ int MainWindow::OnCreate(CREATESTRUCT* pcs)
 	LoadString(0, IDS_REFRESH, s1, sizeof s1);
 	EndProcess.Create(*this, WS_CHILD | WS_VISIBLE | WS_BORDER, s1, ID_REFRESH, (int)BtnRefresh::X, (int)BtnRefresh::Y, (int)BtnRefresh::Width, (int)BtnRefresh::Height);
 
-	ListView* lv = new ListView();
+
 	LoadString(0, IDS_EXTRASTYLE, s1, sizeof s1);
-	lv->SetExSyles(LPSTR(s1), ListProcesses);
+	ListProcesses.SetExSyles(LPSTR(s1), ListProcesses);
 	LoadString(0, IDS_COLL1, s1, sizeof s1);
-	lv->AddColumn(0, (int)ColumnWidth::Name, s1, ListProcesses);
+	ListProcesses.AddColumn(0, (int)ColumnWidth::Name, s1, ListProcesses);
 	LoadString(0, IDS_COLL2, s1, sizeof s1);
-	lv->AddColumn(1, (int)ColumnWidth::ProcID, s1, ListProcesses);
+	ListProcesses.AddColumn(1, (int)ColumnWidth::ProcID, s1, ListProcesses);
 	LoadString(0, IDS_COLL3, s1, sizeof s1);
-	lv->AddColumn(2, (int)ColumnWidth::ThreadNo, s1, ListProcesses);
+	ListProcesses.AddColumn(2, (int)ColumnWidth::ThreadNo, s1, ListProcesses);
 	LoadString(0, IDS_COLL4, s1, sizeof s1);
-	lv->AddColumn(3, (int)ColumnWidth::Loc, s1, ListProcesses);
-	delete lv;
+	ListProcesses.AddColumn(3, (int)ColumnWidth::Loc, s1, ListProcesses);
+	
 	GetProcesses();
 	return 0;
 }
@@ -299,31 +299,18 @@ bool MainWindow::GetProcesses()
 			for (int i = 0; value[i]; i++) value[i] = tolower(value[i]);			
 			pItem->location = value;		
 
+			LV_ITEM newItem2;
 			newItem.mask = LVIF_TEXT | LVIF_PARAM;
 			newItem.iItem = insertIndex;
 			newItem.pszText = _strdup(pItem->szExeFile.c_str());
 			newItem.cchTextMax = strlen(pItem->szExeFile.c_str());
 			newItem.iSubItem = 0;
 			newItem.lParam = (LPARAM)pItem;
-			insertIndex = SendMessage(ListProcesses, LVM_INSERTITEM, 0, (LPARAM)&newItem);
-
-			newItem.mask = LVIF_TEXT;
-			newItem.pszText = _strdup(pItem->procID.c_str());
-			newItem.cchTextMax = strlen(pItem->procID.c_str());
-			newItem.iSubItem = 1;
-			SendMessage(ListProcesses, LVM_SETITEM, 0, (LPARAM)&newItem);
-
-			newItem.mask = LVIF_TEXT;
-			newItem.pszText = _strdup(pItem->threadCount.c_str());
-			newItem.cchTextMax = strlen(pItem->threadCount.c_str());
-			newItem.iSubItem = 2;
-			SendMessage(ListProcesses, LVM_SETITEM, 0, (LPARAM)&newItem);
-
-			newItem.mask = LVIF_TEXT;
-			newItem.pszText = _strdup(pItem->location.c_str());
-			newItem.cchTextMax = strlen(pItem->location.c_str());
-			newItem.iSubItem = 3;
-			SendMessage(ListProcesses, LVM_SETITEM, 0, (LPARAM)&newItem);			
+			
+			insertIndex = ListView_InsertItem(ListProcesses, &newItem);
+			ListView_SetItemText(ListProcesses, insertIndex, 1, _strdup(pItem->procID.c_str()));
+			ListView_SetItemText(ListProcesses, insertIndex, 2, _strdup(pItem->threadCount.c_str())); 
+			ListView_SetItemText(ListProcesses, insertIndex, 3, _strdup(pItem->location.c_str()));
 		}
 	} 
 	while (Process32Next(hProcessSnap, &pe32));
