@@ -76,8 +76,7 @@ protected:
 };
 
 class MainWindow : public Window {
-public:
-	ListItem *pItem;
+public:	
 	TCHAR s1[128];
 	TCHAR s2[128];
 	MainWindow();
@@ -85,7 +84,6 @@ public:
 	ListBox ListBox;
 	Button EndProcess;
 	Button RefreshProceses;
-	std::vector<ListItem*> Lvect;
 	bool GetTasks();
 	bool GetProcesses();
 	ListItem* ListProcessModules(DWORD dwPID, int subitemIndex, ListItem* pItem);

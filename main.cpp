@@ -120,10 +120,9 @@ void MainWindow::OnNotify(LPARAM lParam)
 			case LVN_COLUMNCLICK:
 				OnColumnClick((LPNMLISTVIEW)lParam);
 				break;
-
-			case NM_RCLICK:
+			/*case NM_RCLICK:
 				OnRowRMClick((LPNMLISTVIEW)lParam);					
-				break;
+				break;*/
 			case LVN_KEYDOWN:
 				LPNMLVKEYDOWN pNMLVKEYDOWN = (LPNMLVKEYDOWN)lParam;
 				if (pNMLVKEYDOWN->wVKey == VK_DELETE) OnDeletePress((LPNMLISTVIEW)lParam);	
@@ -197,11 +196,11 @@ void MainWindow::OnCommand(int id){
 			index = 0;
 			break;
 		case IDC_ENDPROCES:
-			index = SendMessage(ListProcesses, LVM_GETNEXTITEM, (WPARAM)-1, (LPARAM)LVNI_SELECTED);
+			index = ListView_GetNextItem(ListProcesses, (WPARAM)-1, (LPARAM)LVNI_SELECTED);
 			while (index != -1) 
 			{
 				KillProcess(index);
-				index = SendMessage(ListProcesses, LVM_GETNEXTITEM, index, (LPARAM)LVNI_SELECTED);
+				ListView_GetNextItem(ListProcesses, index, (LPARAM)LVNI_SELECTED);				
 			}
 			break;	
 		case ID_REFRESH:
@@ -219,7 +218,17 @@ void MainWindow::OnCommand(int id){
 			if (about.DoModal(NULL, *this) == IDOK){}
 			break;
 		case ID_EXIT: 
-			delete[] pItem;
+			index = 0;
+			int rownum = ListView_GetItemCount(ListProcesses);
+			while (rownum > 0 && rownum > index)
+			{
+				LVITEM lvi;
+				lvi.iItem = index;
+				ListView_GetItem(ListProcesses, (LPARAM)&lvi);
+				index++;
+				delete static_cast<ListItem*>((void*)lvi.lParam);
+				ListView_GetNextItem(ListProcesses, index, LVNI_ALL);
+			}
 			DestroyWindow(*this);
 			break;
 	}
@@ -236,14 +245,19 @@ MainWindow::MainWindow(){
 
 bool MainWindow::GetProcesses()
 {
-	ListView_DeleteAllItems(ListProcesses);
-	std::vector<ListItem*>::iterator liter;
-
-	for (liter = Lvect.begin(); liter<Lvect.end();)
+	int index = 0;
+	int rownum = ListView_GetItemCount(ListProcesses);
+	while (rownum > 0 && rownum > index)
 	{
-		delete (*liter);
-		liter = Lvect.erase(liter);
+		LVITEM lvi;		
+		lvi.iItem = index;
+		ListView_GetItem(ListProcesses, (LPARAM)&lvi);
+		index++;
+		delete static_cast<ListItem*>((void*)lvi.lParam);
+		ListView_GetNextItem(ListProcesses, index, LVNI_ALL);
 	}
+
+	ListView_DeleteAllItems(ListProcesses);
 
 	HANDLE hProcessSnap;
 	HANDLE hProcess;
@@ -277,7 +291,7 @@ bool MainWindow::GetProcesses()
 			continue;
 		}
 
-		pItem = new ListItem();
+		ListItem* pItem = new ListItem();
 
 		hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pe32.th32ProcessID);	
 
@@ -288,7 +302,7 @@ bool MainWindow::GetProcesses()
 			std::string value = pe32.szExeFile;	
 			for (int i = 0; value[i]; i++) value[i] = tolower(value[i]);
 
-			pItem->szExeFile  = value.c_str();
+			pItem->szExeFile = value.c_str();
 			pItem->procID = std::to_string(pe32.th32ProcessID);
 			pItem->threadCount = std::to_string(pe32.cntThreads);
 
@@ -303,22 +317,21 @@ bool MainWindow::GetProcesses()
 			else value = szBuffer;
 
 			for (int i = 0; value[i]; i++) value[i] = tolower(value[i]);			
-			pItem->location = value;		
+			pItem->location = value;
 		
 			LV_ITEM newItem;
 			newItem.mask = LVIF_TEXT | LVIF_PARAM;
 			newItem.iItem = insertIndex;
-			newItem.pszText = _strdup(pItem->szExeFile.c_str());
+			newItem.pszText = (LPSTR)(pItem->szExeFile.c_str());
 			newItem.cchTextMax = strlen(pItem->szExeFile.c_str());
 			newItem.iSubItem = 0;
+
 			newItem.lParam = (LPARAM)pItem;		
 			
 			insertIndex = ListView_InsertItem(ListProcesses, &newItem);
-			ListView_SetItemText(ListProcesses, insertIndex, 1, _strdup(pItem->procID.c_str()));
-			ListView_SetItemText(ListProcesses, insertIndex, 2, _strdup(pItem->threadCount.c_str())); 
-			ListView_SetItemText(ListProcesses, insertIndex, 3, _strdup(pItem->location.c_str()));	
-
-			Lvect.push_back(pItem);
+			ListView_SetItemText(ListProcesses, insertIndex, 1, (LPSTR)(pItem->procID.c_str()));
+			ListView_SetItemText(ListProcesses, insertIndex, 2, (LPSTR)(pItem->threadCount.c_str()));
+			ListView_SetItemText(ListProcesses, insertIndex, 3, (LPSTR)(pItem->location.c_str()));
 		}
 	} 
 	while (Process32Next(hProcessSnap, &pe32));
@@ -342,11 +355,9 @@ bool MainWindow::KillProcess(int index)
 	lvi.iSubItem = 1;
 	lvi.pszText = retText;
 	lvi.cchTextMax = MAX_PATH;
-	lvi.iItem = index;
+	lvi.iItem = index;	
 
-	HWND hwndList = GetDlgItem(*this, IDC_LV);
-
-	SendMessage(hwndList, LVM_GETITEM, 0, (LPARAM)&lvi);
+	ListView_GetItem(ListProcesses, (LPARAM)&lvi);
 
 	HANDLE hModuleSnap = INVALID_HANDLE_VALUE;
 	hModuleSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, atoi(lvi.pszText));
@@ -543,7 +554,7 @@ bool MainWindow::OnRowRMClick(LPNMLISTVIEW pLVInfo)
 	lvi.pszText = retText;
 	lvi.cchTextMax = MAX_PATH;
 	lvi.iItem = row;
-	SendMessage(pLVInfo->hdr.hwndFrom, LVM_GETITEM, 0, (LPARAM)&lvi);
+	ListView_GetItem(pLVInfo->hdr.hwndFrom, (LPARAM)&lvi);
 
 	ProcessInfoDialog  pid;
 	pid.ProcessID = retText;
@@ -558,11 +569,12 @@ bool MainWindow::OnRowRMClick(LPNMLISTVIEW pLVInfo)
 
 bool MainWindow::OnDeletePress(LPNMLISTVIEW pLVInfo)
 {
-	int index = SendMessage(pLVInfo->hdr.hwndFrom, LVM_GETNEXTITEM, (WPARAM)-1, (LPARAM)LVNI_SELECTED);
+	ListView_GetNextItem(pLVInfo->hdr.hwndFrom, (WPARAM)-1, (LPARAM)LVNI_SELECTED);
+	int index = ListView_GetNextItem(pLVInfo->hdr.hwndFrom, (WPARAM)-1, (LPARAM)LVNI_SELECTED);
 	while (index != -1)
 	{
 		KillProcess(index);
-		index = SendMessage(pLVInfo->hdr.hwndFrom, LVM_GETNEXTITEM, index, (LPARAM)LVNI_SELECTED);
+		index = ListView_GetNextItem(pLVInfo->hdr.hwndFrom, index, (LPARAM)LVNI_SELECTED);
 	}
 	GetProcesses();
 	return 0;
