@@ -193,13 +193,20 @@ void MainWindow::OnCommand(int id){
 			index = 0;
 			break;
 		case IDC_ENDPROCES:
-			index = ListView_GetNextItem(ListProcesses, (WPARAM)-1, (LPARAM)LVNI_SELECTED);
+			/*index = ListView_GetNextItem(ListProcesses, (WPARAM)-1, (LPARAM)LVNI_SELECTED);
 			while (index != -1) 
 			{
 				KillProcess(index);
 				ListView_GetNextItem(ListProcesses, index, (LPARAM)LVNI_SELECTED);				
 			}
-			break;	
+			break;	*/
+			index = SendMessage(ListProcesses, LVM_GETNEXTITEM, (WPARAM)-1, (LPARAM)LVNI_SELECTED);
+			while (index != -1)
+			{
+				KillProcess(index);
+				index = SendMessage(ListProcesses, LVM_GETNEXTITEM, index, (LPARAM)LVNI_SELECTED);
+			}
+			break;
 		case ID_REFRESH:
 			break;		
 		case IDD_HELP:
@@ -231,7 +238,8 @@ void MainWindow::DeleteListViewPointers()
 		LVITEM lvi;
 		lvi.iItem = index;
 		ListView_GetItem(ListProcesses, (LPARAM)&lvi);		
-		delete reinterpret_cast<ListItem*>(lvi.lParam);
+		
+		//delete reinterpret_cast<ListItem*>(lvi.lParam);
 		index++;
 	}
 }
@@ -560,13 +568,21 @@ bool MainWindow::OnRowRMClick(LPNMLISTVIEW pLVInfo)
 
 bool MainWindow::OnDeletePress(LPNMLISTVIEW pLVInfo)
 {
-	ListView_GetNextItem(pLVInfo->hdr.hwndFrom, (WPARAM)-1, (LPARAM)LVNI_SELECTED);
+	int index = SendMessage(ListProcesses, LVM_GETNEXTITEM, (WPARAM)-1, (LPARAM)LVNI_SELECTED);
+	while (index != -1)
+	{
+		KillProcess(index);
+		index = SendMessage(ListProcesses, LVM_GETNEXTITEM, index, (LPARAM)LVNI_SELECTED);
+	}
+
+	/*ListView_GetNextItem(pLVInfo->hdr.hwndFrom, (WPARAM)-1, (LPARAM)LVNI_SELECTED);
 	int index = ListView_GetNextItem(pLVInfo->hdr.hwndFrom, (WPARAM)-1, (LPARAM)LVNI_SELECTED);
 	while (index != -1)
 	{
 		KillProcess(index);
 		index = ListView_GetNextItem(pLVInfo->hdr.hwndFrom, index, (LPARAM)LVNI_SELECTED);
-	}
+	}*/
+
 	GetProcesses();
 	return 0;
 }
