@@ -231,7 +231,7 @@ void MainWindow::DeleteListViewPointers()
 		LVITEM lvi;
 		lvi.iItem = index;
 		ListView_GetItem(ListProcesses, (LPARAM)&lvi);		
-		delete reinterpret_cast<ListItem*>((void*)lvi.lParam);
+		delete reinterpret_cast<ListItem*>(lvi.lParam);
 		index++;
 	}
 }
