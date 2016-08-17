@@ -120,9 +120,6 @@ void MainWindow::OnNotify(LPARAM lParam)
 			case LVN_COLUMNCLICK:
 				OnColumnClick((LPNMLISTVIEW)lParam);
 				break;
-			/*case NM_RCLICK:
-				OnRowRMClick((LPNMLISTVIEW)lParam);					
-				break;*/
 			case LVN_KEYDOWN:
 				LPNMLVKEYDOWN pNMLVKEYDOWN = (LPNMLVKEYDOWN)lParam;
 				if (pNMLVKEYDOWN->wVKey == VK_DELETE) OnDeletePress((LPNMLISTVIEW)lParam);	
@@ -218,24 +215,29 @@ void MainWindow::OnCommand(int id){
 			if (about.DoModal(NULL, *this) == IDOK){}
 			break;
 		case ID_EXIT: 
-			index = 0;
-			int rownum = ListView_GetItemCount(ListProcesses);
-			while (rownum > 0 && rownum > index)
-			{
-				LVITEM lvi;
-				lvi.iItem = index;
-				ListView_GetItem(ListProcesses, (LPARAM)&lvi);
-				index++;
-				delete static_cast<ListItem*>((void*)lvi.lParam);
-				ListView_GetNextItem(ListProcesses, index, LVNI_ALL);
-			}
+			DeleteListViewPointers();
 			DestroyWindow(*this);
 			break;
 	}
 	GetProcesses();
 }
 
+void MainWindow::DeleteListViewPointers()
+{
+	int index = 0;
+	int rownum = ListView_GetItemCount(ListProcesses);
+	while (rownum > 0 && rownum > index)
+	{
+		LVITEM lvi;
+		lvi.iItem = index;
+		ListView_GetItem(ListProcesses, (LPARAM)&lvi);		
+		delete reinterpret_cast<ListItem*>((void*)lvi.lParam);
+		index++;
+	}
+}
+
 void MainWindow::OnDestroy(){
+	DeleteListViewPointers();
 	::PostQuitMessage(0);
 }
 
@@ -245,18 +247,7 @@ MainWindow::MainWindow(){
 
 bool MainWindow::GetProcesses()
 {
-	int index = 0;
-	int rownum = ListView_GetItemCount(ListProcesses);
-	while (rownum > 0 && rownum > index)
-	{
-		LVITEM lvi;		
-		lvi.iItem = index;
-		ListView_GetItem(ListProcesses, (LPARAM)&lvi);
-		index++;
-		delete static_cast<ListItem*>((void*)lvi.lParam);
-		ListView_GetNextItem(ListProcesses, index, LVNI_ALL);
-	}
-
+	DeleteListViewPointers();
 	ListView_DeleteAllItems(ListProcesses);
 
 	HANDLE hProcessSnap;
