@@ -122,7 +122,7 @@
       <Culture>0x041a</Culture>
     </ResourceCompile>
     <Link>
-      <OutputFile>.\Release/v6b.exe</OutputFile>
+      <OutputFile>.\Release/TaskManager.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ProgramDatabaseFile>.\Release/v6b.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
