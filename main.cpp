@@ -215,7 +215,6 @@ void MainWindow::OnCommand(int id){
 			if (about.DoModal(NULL, *this) == IDOK){}
 			break;
 		case ID_EXIT: 
-			DeleteListViewPointers();
 			DestroyWindow(*this);
 			break;
 	}
